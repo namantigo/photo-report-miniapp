@@ -2,208 +2,379 @@
 <html lang="ru">
 
 <head>
-  <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
+<meta charset="UTF-8">
 
-  <title>Фотоотчёт</title>
+<meta
+  name="viewport"
+  content="width=device-width,
+  initial-scale=1.0,
+  maximum-scale=1.0,
+  user-scalable=no"
+>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Фотоотчёт</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background: var(--tg-theme-bg-color, #f3f4f6);
-      color: var(--tg-theme-text-color, #111827);
-    }
+<style>
 
-    #app {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    .header {
-      margin-bottom: 20px;
-    }
+body {
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
 
-    .title {
-      font-size: 25px;
-      font-weight: 750;
-      margin-bottom: 5px;
-    }
+  background:
+    var(--tg-theme-bg-color, #f3f4f6);
 
-    .subtitle {
-      font-size: 14px;
-      opacity: .6;
-    }
+  color:
+    var(--tg-theme-text-color, #111827);
+}
 
-    .card {
-      width: 100%;
-      border: 0;
-      text-align: left;
+#app {
+  max-width: 700px;
+  margin: auto;
+  padding: 16px;
+}
 
-      background:
-        var(--tg-theme-secondary-bg-color, #ffffff);
+.title {
+  font-size: 25px;
+  font-weight: 750;
+  margin-bottom: 5px;
+}
 
-      color:
-        var(--tg-theme-text-color, #111827);
+.subtitle {
+  font-size: 14px;
+  opacity: .6;
+  margin-bottom: 20px;
+}
 
-      border-radius: 16px;
-      padding: 17px;
-      margin-bottom: 11px;
+.card {
 
-      cursor: pointer;
+  width: 100%;
 
-      box-shadow:
-        0 1px 3px rgba(0,0,0,.06);
-    }
+  border: 0;
 
-    .card:active {
-      transform: scale(.985);
-    }
+  text-align: left;
 
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-    }
+  background:
+    var(
+      --tg-theme-secondary-bg-color,
+      #fff
+    );
 
-    .number {
-      min-width: 42px;
-      height: 42px;
+  color:
+    var(
+      --tg-theme-text-color,
+      #111827
+    );
 
-      padding: 0 6px;
+  border-radius: 16px;
 
-      border-radius: 11px;
+  padding: 17px;
 
-      background:
-        var(--tg-theme-button-color, #2481cc);
+  margin-bottom: 11px;
 
-      color:
-        var(--tg-theme-button-text-color, #fff);
+  box-shadow:
+    0 1px 3px
+    rgba(0,0,0,.06);
+}
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+button.card {
+  cursor: pointer;
+}
 
-      font-weight: 700;
-      font-size: 14px;
-    }
+button.card:active {
+  transform: scale(.985);
+}
 
-    .content {
-      flex: 1;
-      min-width: 0;
-    }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
 
-    .card-title {
-      font-size: 18px;
-      font-weight: 650;
-    }
+.number {
 
-    .card-info,
-    .status {
-      margin-top: 6px;
-      font-size: 14px;
-    }
+  min-width: 44px;
+  height: 44px;
 
-    .card-info,
-    .open {
-      opacity: .6;
-    }
+  padding: 0 7px;
 
-    .busy {
-      color: #d97706;
-      font-weight: 600;
-    }
+  border-radius: 12px;
 
-    .arrow {
-      font-size: 24px;
-      opacity: .3;
-    }
+  background:
+    var(
+      --tg-theme-button-color,
+      #2481cc
+    );
 
-    .back {
-      border: 0;
-      background: transparent;
+  color:
+    var(
+      --tg-theme-button-text-color,
+      white
+    );
 
-      color:
-        var(--tg-theme-link-color, #2481cc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-      font-size: 16px;
+  font-weight: 700;
+}
 
-      padding: 4px 0 16px;
+.content {
+  flex: 1;
+}
 
-      cursor: pointer;
-    }
+.card-title {
+  font-size: 18px;
+  font-weight: 650;
+}
 
-    .loader {
-      text-align: center;
-      padding: 60px 10px;
-      opacity: .6;
-    }
+.info {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: .6;
+}
 
-    .error {
-      background: #fee2e2;
-      color: #991b1b;
+.busy {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #d97706;
+}
 
-      padding: 16px;
+.mine {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #16a34a;
+  font-weight: 600;
+}
 
-      border-radius: 14px;
-    }
-  </style>
+.arrow {
+  font-size: 24px;
+  opacity: .3;
+}
+
+.back {
+
+  border: 0;
+  background: transparent;
+
+  color:
+    var(
+      --tg-theme-link-color,
+      #2481cc
+    );
+
+  font-size: 16px;
+
+  padding:
+    4px 0 16px 0;
+}
+
+.task-screen {
+  padding-top: 4px;
+}
+
+.big-number {
+
+  width: 60px;
+  height: 60px;
+
+  border-radius: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    var(
+      --tg-theme-button-color,
+      #2481cc
+    );
+
+  color:
+    var(
+      --tg-theme-button-text-color,
+      #fff
+    );
+
+  font-weight: 750;
+
+  margin-bottom: 16px;
+}
+
+.task-name {
+  font-size: 28px;
+  font-weight: 750;
+  margin-bottom: 7px;
+}
+
+.photo-counter {
+
+  margin-top: 22px;
+  margin-bottom: 12px;
+
+  padding: 16px;
+
+  border-radius: 15px;
+
+  background:
+    var(
+      --tg-theme-secondary-bg-color,
+      #fff
+    );
+
+  font-size: 17px;
+}
+
+.action {
+
+  width: 100%;
+
+  border: 0;
+
+  border-radius: 15px;
+
+  padding: 17px;
+
+  margin-top: 10px;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.photo-button {
+
+  background:
+    var(
+      --tg-theme-button-color,
+      #2481cc
+    );
+
+  color:
+    var(
+      --tg-theme-button-text-color,
+      #fff
+    );
+}
+
+.finish-button {
+
+  background: #16a34a;
+  color: white;
+}
+
+.finish-button:disabled {
+
+  opacity: .4;
+  cursor: default;
+}
+
+.uploading {
+
+  text-align: center;
+  padding: 15px;
+
+  font-size: 15px;
+  opacity: .7;
+}
+
+.error {
+
+  padding: 16px;
+
+  border-radius: 14px;
+
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.loader {
+
+  text-align: center;
+  padding: 60px 10px;
+  opacity: .6;
+}
+
+</style>
+
 </head>
+
 
 <body>
 
 <div id="app">
+
   <div class="loader">
     Загрузка фотоотчёта…
   </div>
+
 </div>
+
+
+<input
+  id="cameraInput"
+  type="file"
+  accept="image/*"
+  capture="environment"
+  hidden
+>
 
 
 <script>
 
 const API_URL =
-  'https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
+'https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
 
-
-/* =========================
-   TELEGRAM
-========================= */
 
 const tg =
-  window.Telegram &&
-  window.Telegram.WebApp
-    ? window.Telegram.WebApp
-    : null;
+  window.Telegram?.WebApp;
+
 
 if (tg) {
+
   tg.ready();
   tg.expand();
 }
 
 
-/* =========================
-   STATE
-========================= */
+const initData =
+  tg?.initData || '';
+
+
+const telegramUserId =
+  tg?.initDataUnsafe?.user?.id
+    ? String(
+        tg.initDataUnsafe.user.id
+      )
+    : '';
+
 
 let appData = null;
+
 let currentLocationId = null;
 
+let currentTaskId = null;
 
-/* =========================
-   LOAD DATA
-========================= */
+let uploading = false;
+
+
+
+/* =====================
+   LOAD
+===================== */
 
 async function loadData() {
 
@@ -211,262 +382,128 @@ async function loadData() {
 
     const response =
       await fetch(
-        API_URL + '?action=data'
+        API_URL +
+        '?action=data&t=' +
+        Date.now()
       );
 
-    if (!response.ok) {
-      throw new Error(
-        'HTTP ' + response.status
-      );
-    }
 
     const result =
       await response.json();
 
+
     if (!result.ok) {
+
       throw new Error(
-        result.error || 'Ошибка API'
+        result.error ||
+        'Ошибка API'
       );
     }
 
-    appData = result.data;
+
+    appData =
+      result.data;
+
 
     renderLocations();
 
+
   } catch (error) {
 
-    console.error(error);
+    document
+      .getElementById('app')
+      .innerHTML =
 
-    document.getElementById('app').innerHTML =
       '<div class="error">' +
-      '<b>Ошибка загрузки</b><br><br>' +
-      escapeHtml(error.message) +
+      'Ошибка загрузки:<br><br>' +
+      escapeHtml(
+        error.message
+      ) +
       '</div>';
   }
 }
 
 
-/* =========================
+
+/* =====================
    LOCATIONS
-========================= */
+===================== */
 
 function renderLocations() {
 
   currentLocationId = null;
+  currentTaskId = null;
 
-  const event = appData.event;
+
+  let html = `
+
+    <div class="title">
+      📸 ${escapeHtml(
+        appData.event.name
+      )}
+    </div>
+
+    <div class="subtitle">
+      Выберите локацию
+    </div>
+  `;
+
 
   const locations =
     [...appData.locations]
       .sort(
-        (a, b) =>
+        (a,b) =>
           Number(a.order) -
           Number(b.order)
       );
 
-  let html = `
-    <div class="header">
 
-      <div class="title">
-        📸 ${escapeHtml(event.name)}
-      </div>
+  locations.forEach(
+    location => {
 
-      <div class="subtitle">
-        Выберите локацию
-      </div>
-
-    </div>
-  `;
-
-
-  locations.forEach(location => {
-
-    const tasks =
-      appData.tasks.filter(
-        task =>
-          task.locationId ===
-            location.locationId &&
-          task.status !== 'DONE'
-      );
-
-    html += `
-      <button
-        type="button"
-        class="card"
-        onclick="openLocation('${escapeJs(location.locationId)}')"
-      >
-
-        <div class="row">
-
-          <div class="number">
-            ${escapeHtml(location.number)}
-          </div>
-
-          <div class="content">
-
-            <div class="card-title">
-              ${escapeHtml(location.name)}
-            </div>
-
-            <div class="card-info">
-              Осталось заданий:
-              <b>${tasks.length}</b>
-            </div>
-
-          </div>
-
-          <div class="arrow">
-            ›
-          </div>
-
-        </div>
-
-      </button>
-    `;
-  });
-
-
-  document.getElementById('app').innerHTML =
-    html;
-}
-
-
-/* =========================
-   OPEN LOCATION
-========================= */
-
-function openLocation(locationId) {
-
-  currentLocationId = locationId;
-
-  renderTasks();
-}
-
-
-/* =========================
-   TASKS
-========================= */
-
-function renderTasks() {
-
-  const location =
-    appData.locations.find(
-      item =>
-        item.locationId ===
-        currentLocationId
-    );
-
-  if (!location) {
-    renderLocations();
-    return;
-  }
-
-
-  const tasks =
-    appData.tasks
-
-      .filter(
-        task =>
-          task.locationId ===
-            currentLocationId &&
-          task.status !== 'DONE'
-      )
-
-      .sort(
-        (a, b) =>
-          compareTaskNumbers(
-            a.number,
-            b.number
-          )
-      );
-
-
-  let html = `
-
-    <button
-      type="button"
-      class="back"
-      onclick="renderLocations()"
-    >
-      ‹ Назад
-    </button>
-
-
-    <div class="header">
-
-      <div class="title">
-        ${escapeHtml(location.number)}.
-        ${escapeHtml(location.name)}
-      </div>
-
-      <div class="subtitle">
-        Заданий:
-        <b>${tasks.length}</b>
-      </div>
-
-    </div>
-  `;
-
-
-  if (tasks.length === 0) {
-
-    html += `
-      <div class="card">
-
-        <div class="card-title">
-          ✅ Всё выполнено
-        </div>
-
-      </div>
-    `;
-
-  } else {
-
-    tasks.forEach(task => {
-
-      let statusText =
-        'Готово к выполнению';
-
-      let statusClass =
-        'open';
-
-
-      if (
-        task.status ===
-        'IN_PROGRESS'
-      ) {
-
-        statusText =
-          '⏳ Выполняется';
-
-        statusClass =
-          'busy';
-      }
+      const remaining =
+        appData.tasks.filter(
+          task =>
+            task.locationId ===
+              location.locationId &&
+            task.status !==
+              'DONE'
+        ).length;
 
 
       html += `
 
         <button
-          type="button"
           class="card"
-          onclick="testTaskClick('${escapeJs(task.taskId)}')"
+          onclick="
+            openLocation(
+              '${escapeJs(
+                location.locationId
+              )}'
+            )
+          "
         >
 
           <div class="row">
 
             <div class="number">
-              ${escapeHtml(task.number)}
+              ${escapeHtml(
+                location.number
+              )}
             </div>
 
 
             <div class="content">
 
               <div class="card-title">
-                ${escapeHtml(task.name)}
+                ${escapeHtml(
+                  location.name
+                )}
               </div>
 
-              <div class="status ${statusClass}">
-                ${statusText}
+              <div class="info">
+                Осталось:
+                <b>${remaining}</b>
               </div>
 
             </div>
@@ -480,254 +517,929 @@ function renderTasks() {
 
         </button>
       `;
-    });
-  }
+    }
+  );
 
 
-  document.getElementById('app').innerHTML =
+  document
+    .getElementById('app')
+    .innerHTML =
     html;
 }
 
 
-/* =========================
-   TEST CLICK
-========================= */
 
-async function testTaskClick(taskId) {
+/* =====================
+   TASK LIST
+===================== */
 
-  const task = appData.tasks.find(
-    item => item.taskId === taskId
+function openLocation(id) {
+
+  currentLocationId = id;
+
+  renderTasks();
+}
+
+
+function renderTasks() {
+
+  const location =
+    appData.locations.find(
+      x =>
+        x.locationId ===
+        currentLocationId
+    );
+
+
+  const tasks =
+    appData.tasks
+
+      .filter(
+        task =>
+          task.locationId ===
+            currentLocationId &&
+          task.status !==
+            'DONE'
+      )
+
+      .sort(
+        (a,b) =>
+          String(a.number)
+            .localeCompare(
+              String(b.number),
+              undefined,
+              {numeric:true}
+            )
+      );
+
+
+  let html = `
+
+    <button
+      class="back"
+      onclick="renderLocations()"
+    >
+      ‹ Назад
+    </button>
+
+
+    <div class="title">
+      ${escapeHtml(
+        location.number
+      )}.
+      ${escapeHtml(
+        location.name
+      )}
+    </div>
+
+
+    <div class="subtitle">
+      Осталось заданий:
+      ${tasks.length}
+    </div>
+  `;
+
+
+  if (!tasks.length) {
+
+    html += `
+
+      <div class="card">
+        <div class="card-title">
+          ✅ Всё выполнено
+        </div>
+      </div>
+    `;
+  }
+
+
+  tasks.forEach(
+    task => {
+
+
+      let status =
+        '<div class="info">' +
+        'Готово к выполнению' +
+        '</div>';
+
+
+      if (
+        task.status ===
+        'IN_PROGRESS'
+      ) {
+
+        if (
+          String(
+            task.reservedBy
+          ) === telegramUserId
+        ) {
+
+          status =
+            '<div class="mine">' +
+            '● Ваше задание' +
+            '</div>';
+
+        } else {
+
+          status =
+            '<div class="busy">' +
+            '⏳ Выполняется' +
+            '</div>';
+        }
+      }
+
+
+      html += `
+
+        <button
+          class="card"
+          onclick="
+            selectTask(
+              '${escapeJs(
+                task.taskId
+              )}'
+            )
+          "
+        >
+
+          <div class="row">
+
+            <div class="number">
+              ${escapeHtml(
+                task.number
+              )}
+            </div>
+
+
+            <div class="content">
+
+              <div class="card-title">
+                ${escapeHtml(
+                  task.name
+                )}
+              </div>
+
+              ${status}
+
+            </div>
+
+
+            <div class="arrow">
+              ›
+            </div>
+
+          </div>
+
+        </button>
+      `;
+    }
   );
 
-  if (!task) {
-    alert('Задание не найдено');
-    return;
-  }
 
-  // Если уже занято
-  if (task.status === 'IN_PROGRESS') {
-    alert('Это задание уже выполняется');
-    return;
-  }
+  document
+    .getElementById('app')
+    .innerHTML =
+    html;
+}
 
-  const initData =
-    window.Telegram?.WebApp?.initData || '';
+
+
+/* =====================
+   RESERVE
+===================== */
+
+async function selectTask(
+  taskId
+) {
 
   if (!initData) {
+
     alert(
-      'Нет данных Telegram. Откройте фотоотчёт через кнопку бота.'
+      'Откройте фотоотчёт через Telegram.'
     );
+
     return;
   }
+
+
+  const task =
+    appData.tasks.find(
+      x =>
+        x.taskId === taskId
+    );
+
+
+  if (!task) return;
+
+
+  if (
+    task.status ===
+      'IN_PROGRESS' &&
+    String(
+      task.reservedBy
+    ) !== telegramUserId
+  ) {
+
+    alert(
+      'Это задание уже выполняет другой участник.'
+    );
+
+    return;
+  }
+
 
   try {
 
-    const response = await fetch(
+    showLoading(
+      'Открываем задание…'
+    );
+
+
+    const result =
+      await postApi({
+        action:
+          'reserve',
+
+        taskId:
+          taskId,
+
+        initData:
+          initData
+      });
+
+
+    if (
+      !result.ok
+    ) {
+
+      if (
+        result.code ===
+        'BUSY'
+      ) {
+
+        alert(
+          'Задание уже взял другой участник.'
+        );
+
+      } else if (
+        result.code ===
+        'ACTIVE_TASK_EXISTS'
+      ) {
+
+        alert(
+          'Сначала завершите ваше текущее задание.'
+        );
+
+      } else {
+
+        alert(
+          'Не удалось открыть задание: ' +
+          (
+            result.code ||
+            result.error ||
+            'ошибка'
+          )
+        );
+      }
+
+
+      await refreshAndReturn();
+
+      return;
+    }
+
+
+    currentTaskId =
+      taskId;
+
+
+    await refreshDataOnly();
+
+
+    renderTaskScreen();
+
+
+  } catch (error) {
+
+    alert(
+      'Ошибка связи: ' +
+      error.message
+    );
+
+    renderTasks();
+  }
+}
+
+
+
+/* =====================
+   TASK SCREEN
+===================== */
+
+function renderTaskScreen() {
+
+  const task =
+    appData.tasks.find(
+      x =>
+        x.taskId ===
+        currentTaskId
+    );
+
+
+  if (!task) {
+
+    renderTasks();
+    return;
+  }
+
+
+  const photoCount =
+    Number(
+      task.photoCount || 0
+    );
+
+
+  document
+    .getElementById('app')
+    .innerHTML = `
+
+      <div class="task-screen">
+
+
+        <button
+          class="back"
+          onclick="renderTasks()"
+        >
+          ‹ К списку
+        </button>
+
+
+        <div class="big-number">
+          ${escapeHtml(
+            task.number
+          )}
+        </div>
+
+
+        <div class="task-name">
+          ${escapeHtml(
+            task.name
+          )}
+        </div>
+
+
+        <div class="subtitle">
+          Сделайте необходимые фотографии.
+          Количество не ограничено.
+        </div>
+
+
+        <div class="photo-counter">
+
+          📷 Фотографий:
+          <b>${photoCount}</b>
+
+        </div>
+
+
+        <button
+          class="action photo-button"
+          onclick="openCamera()"
+          ${uploading
+            ? 'disabled'
+            : ''}
+        >
+
+          📷 Добавить фото
+
+        </button>
+
+
+        <button
+          class="action finish-button"
+          onclick="finishTask()"
+
+          ${
+            photoCount < 1 ||
+            uploading
+
+              ? 'disabled'
+              : ''
+          }
+        >
+
+          ✅ Завершить
+
+        </button>
+
+
+        ${
+          uploading
+
+            ? '<div class="uploading">' +
+              'Загружаем фотографию…' +
+              '</div>'
+
+            : ''
+        }
+
+      </div>
+    `;
+}
+
+
+
+/* =====================
+   CAMERA
+===================== */
+
+function openCamera() {
+
+  if (uploading) return;
+
+
+  document
+    .getElementById(
+      'cameraInput'
+    )
+    .click();
+}
+
+
+document
+  .getElementById(
+    'cameraInput'
+  )
+  .addEventListener(
+    'change',
+    async function(event) {
+
+
+      const file =
+        event.target.files[0];
+
+
+      if (!file) return;
+
+
+      uploading = true;
+
+      renderTaskScreen();
+
+
+      try {
+
+        const image =
+          await compressImage(
+            file
+          );
+
+
+        const result =
+          await postApi({
+
+            action:
+              'uploadPhoto',
+
+            taskId:
+              currentTaskId,
+
+            initData:
+              initData,
+
+            imageBase64:
+              image
+          });
+
+
+        if (!result.ok) {
+
+          throw new Error(
+            result.code ||
+            result.error ||
+            'Ошибка загрузки'
+          );
+        }
+
+
+        await refreshDataOnly();
+
+
+      } catch (error) {
+
+        alert(
+          'Не удалось загрузить фото: ' +
+          error.message
+        );
+
+      } finally {
+
+        uploading = false;
+
+
+        event.target.value =
+          '';
+
+
+        renderTaskScreen();
+      }
+    }
+  );
+
+
+
+/* =====================
+   IMAGE COMPRESSION
+===================== */
+
+function compressImage(
+  file
+) {
+
+  return new Promise(
+    (resolve,reject) => {
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onerror =
+        reject;
+
+
+      reader.onload =
+        function(e) {
+
+
+          const img =
+            new Image();
+
+
+          img.onerror =
+            reject;
+
+
+          img.onload =
+            function() {
+
+
+              const MAX =
+                1600;
+
+
+              let width =
+                img.width;
+
+              let height =
+                img.height;
+
+
+              if (
+                width > MAX ||
+                height > MAX
+              ) {
+
+                const ratio =
+                  Math.min(
+                    MAX / width,
+                    MAX / height
+                  );
+
+
+                width =
+                  Math.round(
+                    width * ratio
+                  );
+
+                height =
+                  Math.round(
+                    height * ratio
+                  );
+              }
+
+
+              const canvas =
+                document
+                  .createElement(
+                    'canvas'
+                  );
+
+
+              canvas.width =
+                width;
+
+              canvas.height =
+                height;
+
+
+              const ctx =
+                canvas
+                  .getContext(
+                    '2d'
+                  );
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
+
+
+              const data =
+                canvas
+                  .toDataURL(
+                    'image/jpeg',
+                    .82
+                  );
+
+
+              resolve(
+                data
+              );
+            };
+
+
+          img.src =
+            e.target.result;
+        };
+
+
+      reader
+        .readAsDataURL(
+          file
+        );
+    }
+  );
+}
+
+
+
+/* =====================
+   FINISH
+===================== */
+
+async function finishTask() {
+
+  const task =
+    appData.tasks.find(
+      x =>
+        x.taskId ===
+        currentTaskId
+    );
+
+
+  if (!task) return;
+
+
+  if (
+    Number(
+      task.photoCount || 0
+    ) < 1
+  ) {
+
+    alert(
+      'Сначала добавьте хотя бы одну фотографию.'
+    );
+
+    return;
+  }
+
+
+  if (
+    !confirm(
+      'Завершить это задание?'
+    )
+  ) {
+
+    return;
+  }
+
+
+  try {
+
+    showLoading(
+      'Завершаем…'
+    );
+
+
+    const result =
+      await postApi({
+
+        action:
+          'finishTask',
+
+        taskId:
+          currentTaskId,
+
+        initData:
+          initData
+      });
+
+
+    if (!result.ok) {
+
+      throw new Error(
+        result.code ||
+        result.error ||
+        'Ошибка завершения'
+      );
+    }
+
+
+    currentTaskId =
+      null;
+
+
+    await refreshDataOnly();
+
+
+    renderTasks();
+
+
+  } catch (error) {
+
+    alert(
+      'Не удалось завершить: ' +
+      error.message
+    );
+
+    renderTaskScreen();
+  }
+}
+
+
+
+/* =====================
+   API
+===================== */
+
+async function postApi(
+  data
+) {
+
+  const response =
+    await fetch(
       API_URL,
       {
-        method: 'POST',
+        method:
+          'POST',
 
         headers: {
           'Content-Type':
             'text/plain;charset=utf-8'
         },
 
-        body: JSON.stringify({
-          action: 'reserve',
-          taskId: taskId,
-          initData: initData
-        })
+        body:
+          JSON.stringify(
+            data
+          )
       }
     );
 
-    const text =
-  await response.text();
 
-alert(
-  'HTTP: ' +
-  response.status +
-  '\n\n' +
-  text.substring(0, 500)
-);
+  const text =
+    await response.text();
 
-return;
-
-
-    if (
-      result.ok &&
-      (
-        result.code === 'RESERVED' ||
-        result.code === 'ALREADY_RESERVED'
-      )
-    ) {
-
-      alert('✅ Задание принято');
-
-      // Получаем свежее состояние из Sheets
-      await refreshData();
-
-      return;
-    }
-
-
-    if (result.code === 'BUSY') {
-
-      alert(
-        'Задание уже взял другой участник'
-      );
-
-    } else if (
-      result.code === 'ACTIVE_TASK_EXISTS'
-    ) {
-
-      alert(
-        'У вас уже есть активное задание'
-      );
-
-    } else if (
-      result.code === 'DONE'
-    ) {
-
-      alert(
-        'Задание уже выполнено'
-      );
-
-    } else {
-
-      alert(
-        'Ошибка: ' +
-        (
-          result.code ||
-          result.error ||
-          'неизвестная ошибка'
-        )
-      );
-    }
-
-
-    await refreshData();
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      'Ошибка связи: ' +
-      error.message
-    );
-  }
-}
-
-
-async function refreshData() {
 
   try {
 
-    const locationId =
-      currentLocationId;
-
-    const response =
-      await fetch(
-        API_URL +
-        '?action=data&t=' +
-        Date.now()
-      );
-
-    const result =
-      await response.json();
-
-    if (!result.ok) {
-      throw new Error(
-        result.error || 'Ошибка API'
-      );
-    }
-
-    appData = result.data;
-
-    currentLocationId =
-      locationId;
-
-    renderTasks();
+    return JSON.parse(
+      text
+    );
 
   } catch (error) {
 
-    console.error(error);
-
-    alert(
-      'Не удалось обновить задания'
+    throw new Error(
+      'Сервер вернул некорректный ответ'
     );
   }
 }
 
 
-/* =========================
-   HELPERS
-========================= */
+async function refreshDataOnly() {
 
-function compareTaskNumbers(a, b) {
+  const response =
+    await fetch(
+      API_URL +
+      '?action=data&t=' +
+      Date.now()
+    );
 
-  return String(a).localeCompare(
-    String(b),
-    undefined,
-    {
-      numeric: true,
-      sensitivity: 'base'
-    }
+
+  const result =
+    await response.json();
+
+
+  if (!result.ok) {
+
+    throw new Error(
+      result.error ||
+      'Ошибка обновления'
+    );
+  }
+
+
+  appData =
+    result.data;
+}
+
+
+async function refreshAndReturn() {
+
+  await refreshDataOnly();
+
+  renderTasks();
+}
+
+
+
+/* =====================
+   UI
+===================== */
+
+function showLoading(
+  text
+) {
+
+  document
+    .getElementById('app')
+    .innerHTML = `
+
+      <div class="loader">
+        ${escapeHtml(text)}
+      </div>
+    `;
+}
+
+
+
+/* =====================
+   ESCAPE
+===================== */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ''
+  )
+
+  .replaceAll(
+    '&',
+    '&amp;'
+  )
+
+  .replaceAll(
+    '<',
+    '&lt;'
+  )
+
+  .replaceAll(
+    '>',
+    '&gt;'
+  )
+
+  .replaceAll(
+    '"',
+    '&quot;'
+  )
+
+  .replaceAll(
+    "'",
+    '&#039;'
   );
 }
 
 
-function escapeHtml(value) {
+function escapeJs(
+  value
+) {
 
-  return String(value ?? '')
+  return String(
+    value ?? ''
+  )
 
-    .replaceAll(
-      '&',
-      '&amp;'
-    )
+  .replaceAll(
+    '\\',
+    '\\\\'
+  )
 
-    .replaceAll(
-      '<',
-      '&lt;'
-    )
-
-    .replaceAll(
-      '>',
-      '&gt;'
-    )
-
-    .replaceAll(
-      '"',
-      '&quot;'
-    )
-
-    .replaceAll(
-      "'",
-      '&#039;'
-    );
+  .replaceAll(
+    "'",
+    "\\'"
+  );
 }
 
 
-function escapeJs(value) {
 
-  return String(value ?? '')
-
-    .replaceAll(
-      '\\',
-      '\\\\'
-    )
-
-    .replaceAll(
-      "'",
-      "\\'"
-    );
-}
-
-
-/* =========================
+/* =====================
    START
-========================= */
+===================== */
 
 loadData();
 
