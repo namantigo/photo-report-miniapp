@@ -296,6 +296,123 @@
           task.status !== 'DONE'
       )
       .sort((a, b) =>
+
+async function selectTask(taskId) {
+
+  const task = appData.tasks.find(
+    item => item.taskId === taskId
+  );
+
+  if (!task) return;
+
+  if (task.status === 'IN_PROGRESS') {
+    alert('Это задание уже выполняется.');
+    return;
+  }
+
+  const initData =
+    window.Telegram?.WebApp?.initData || '';
+
+  if (!initData) {
+    alert(
+      'Нет данных Telegram. Откройте фотоотчёт через кнопку бота.'
+    );
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      API_URL,
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+
+        body: JSON.stringify({
+          action: 'reserve',
+          taskId: taskId,
+          initData: initData
+        })
+      }
+    );
+
+    const result =
+      await response.json();
+
+    if (
+      result.ok &&
+      (
+        result.code === 'RESERVED' ||
+        result.code === 'ALREADY_RESERVED'
+      )
+    ) {
+
+      task.status = 'IN_PROGRESS';
+
+      const tgUser =
+        window.Telegram.WebApp
+          .initDataUnsafe?.user;
+
+      if (tgUser) {
+        task.reservedBy =
+          String(tgUser.id);
+      }
+
+      alert('Задание принято');
+
+      renderTasks();
+
+      return;
+    }
+
+    if (result.code === 'BUSY') {
+      alert(
+        'Это задание уже взял другой участник.'
+      );
+    }
+
+    else if (
+      result.code === 'ACTIVE_TASK_EXISTS'
+    ) {
+      alert(
+        'Сначала завершите текущее задание.'
+      );
+    }
+
+    else if (result.code === 'DONE') {
+      alert(
+        'Это задание уже выполнено.'
+      );
+    }
+
+    else {
+      alert(
+        'Не удалось взять задание: ' +
+        (result.code || result.error || 'ошибка')
+      );
+    }
+
+    // Получаем свежее состояние
+    await loadData();
+
+    if (currentLocation) {
+      renderTasks();
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      'Ошибка связи с сервером: ' +
+      error.message
+    );
+  }
+}
+        
         compareTaskNumbers(a.number, b.number)
       );
 
@@ -340,7 +457,10 @@
         }
 
         html += `
-          <button class="card">
+          <button
+  class="card"
+  onclick="selectTask('${escapeJs(task.taskId)}')"
+>
             <div class="row">
 
               <div class="number">
