@@ -8,34 +8,27 @@
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--tg-theme-bg-color,#f3f4f6);color:var(--tg-theme-text-color,#111827)}
-#app{max-width:700px;margin:auto;padding:16px}
-.title{font-size:25px;font-weight:750;margin-bottom:5px}
-.subtitle{font-size:14px;opacity:.65;margin-bottom:20px;line-height:1.45}
+#app{max-width:720px;margin:auto;padding:16px}
+.title{font-size:25px;font-weight:760;margin-bottom:5px}.subtitle{font-size:14px;opacity:.65;margin-bottom:20px;line-height:1.45}
 .card{width:100%;border:0;text-align:left;background:var(--tg-theme-secondary-bg-color,#fff);color:var(--tg-theme-text-color,#111827);border-radius:16px;padding:17px;margin-bottom:11px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-button.card{cursor:pointer}
-.row{display:flex;align-items:center;gap:13px}
+button.card{cursor:pointer}.row{display:flex;align-items:center;gap:13px}.content{flex:1;min-width:0}
 .number,.big-number{display:flex;align-items:center;justify-content:center;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff);font-weight:750}
-.number{min-width:44px;height:44px;padding:0 7px;border-radius:12px}
-.big-number{width:auto;min-width:60px;height:60px;padding:0 12px;border-radius:17px;margin-bottom:16px;display:inline-flex}
-.content{flex:1}.card-title{font-size:18px;font-weight:650}.info{margin-top:6px;font-size:14px;opacity:.6}.busy{margin-top:6px;font-size:14px;color:#d97706}.mine{margin-top:6px;font-size:14px;color:#16a34a;font-weight:600}.arrow{font-size:24px;opacity:.3}
-.back{border:0;background:transparent;color:var(--tg-theme-link-color,#2481cc);font-size:16px;padding:4px 0 16px}
-.task-name{font-size:28px;font-weight:750;margin-bottom:7px}
-.instruction{padding:14px;border-radius:14px;background:var(--tg-theme-secondary-bg-color,#fff);margin:14px 0;line-height:1.45}
-.photo-counter{margin:18px 0 12px;padding:16px;border-radius:15px;background:var(--tg-theme-secondary-bg-color,#fff);font-size:17px}
-.action{width:100%;border:0;border-radius:15px;padding:17px;margin-top:10px;font-size:17px;font-weight:700;cursor:pointer}
-.photo-button{background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff)}
-.finish-button{background:#16a34a;color:white}.finish-button:disabled,.action:disabled{opacity:.4;cursor:default}
-.cancel-button{background:transparent;color:#d14343;border:1px solid #d14343}
+.number{min-width:44px;height:44px;padding:0 7px;border-radius:12px}.big-number{min-width:60px;height:60px;padding:0 12px;border-radius:17px;margin-bottom:16px;display:inline-flex}
+.card-title{font-size:18px;font-weight:650}.info{margin-top:6px;font-size:14px;opacity:.6}.busy{margin-top:6px;font-size:14px;color:#d97706}.mine{margin-top:6px;font-size:14px;color:#16a34a;font-weight:600}.arrow{font-size:24px;opacity:.3}
+.back{border:0;background:transparent;color:var(--tg-theme-link-color,#2481cc);font-size:16px;padding:4px 0 16px}.task-name{font-size:28px;font-weight:750;margin-bottom:7px}
+.instruction{padding:14px;border-radius:14px;background:var(--tg-theme-secondary-bg-color,#fff);margin:14px 0;line-height:1.45}.photo-counter{margin:18px 0 12px;padding:16px;border-radius:15px;background:var(--tg-theme-secondary-bg-color,#fff);font-size:17px}
+.action{width:100%;border:0;border-radius:15px;padding:17px;margin-top:10px;font-size:17px;font-weight:700;cursor:pointer}.photo-button{background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff)}.finish-button{background:#16a34a;color:white}.cancel-button{background:transparent;color:#d14343;border:1px solid #d14343}.action:disabled{opacity:.4;cursor:default}
 .loader{text-align:center;padding:60px 10px;opacity:.65}.error{padding:16px;border-radius:14px;background:#fee2e2;color:#991b1b}
-.photo-list{margin:12px 0}.photo-item{display:flex;align-items:center;gap:10px;background:var(--tg-theme-secondary-bg-color,#fff);border-radius:13px;padding:12px;margin-bottom:8px}
-.photo-file{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.delete-photo{border:0;border-radius:10px;padding:9px 11px;background:#fee2e2;color:#b91c1c;font-size:16px}
-.requirement{font-size:13px;opacity:.7;margin-top:5px}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 18px}
+.photo-tile{position:relative;aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:var(--tg-theme-secondary-bg-color,#fff);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.photo-tile img{width:100%;height:100%;object-fit:cover;display:block}.photo-placeholder{height:100%;display:flex;align-items:center;justify-content:center;font-size:12px;padding:8px;text-align:center;opacity:.6}
+.delete-photo{position:absolute;right:5px;top:5px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(185,28,28,.92);color:white;font-size:17px;display:flex;align-items:center;justify-content:center}
+.photo-caption{position:absolute;left:0;right:0;bottom:0;padding:5px 6px;background:rgba(0,0,0,.58);color:white;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.requirement{font-size:13px;opacity:.7;margin-top:5px}.day-date{font-size:13px;opacity:.6;margin-top:5px}
 </style>
 </head>
 <body>
 <div id="app"><div class="loader">Загрузка фотоотчёта…</div></div>
-
 <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 <input id="galleryInput" type="file" accept="image/*" multiple hidden>
 
@@ -47,42 +40,73 @@ if(tg){tg.ready();tg.expand()}
 
 const initData=tg?.initData||'';
 const telegramUserId=tg?.initDataUnsafe?.user?.id?String(tg.initDataUnsafe.user.id):'';
-
 const params=new URLSearchParams(window.location.search);
 const startParam=tg?.initDataUnsafe?.start_param||'';
 const eventKey=params.get('event')||startParam||'';
 
 let appData=null;
+let currentDayId=null;
 let currentLocationId=null;
 let currentTaskId=null;
 let uploading=false;
 
-function eventQuery(){
-  return eventKey ? '&event='+encodeURIComponent(eventKey) : '';
-}
+function eventQuery(){return eventKey?'&event='+encodeURIComponent(eventKey):''}
 
 async function loadData(){
   try{
-    const response=await fetch(API_URL+'?action=data&t='+Date.now()+eventQuery());
-    const result=await response.json();
-    if(!result.ok)throw new Error(result.code||result.error||'Ошибка загрузки');
-    appData=result.data;
-    renderLocations();
+    await refreshDataOnly();
+    renderDays();
   }catch(error){
     document.getElementById('app').innerHTML='<div class="error">Ошибка загрузки:<br><br>'+escapeHtml(error.message)+'</div>';
   }
 }
 
+/* ===================== DAYS ===================== */
+
+function renderDays(){
+  currentDayId=null;
+  currentLocationId=null;
+  currentTaskId=null;
+
+  const days=[...(appData.days||[])].sort((a,b)=>Number(a.order)-Number(b.order));
+
+  let html='<div class="title">📸 '+escapeHtml(appData.event.name)+'</div><div class="subtitle">Выберите день фотоотчёта</div>';
+
+  days.forEach(day=>{
+    const tasks=appData.tasks.filter(t=>t.dayId===day.dayId);
+    const remaining=tasks.filter(t=>t.status!=='DONE').length;
+    const done=tasks.filter(t=>t.status==='DONE').length;
+
+    html+=`<button class="card" onclick="openDay('${escapeJs(day.dayId)}')"><div class="row"><div class="number">${escapeHtml(day.day||day.order)}</div><div class="content"><div class="card-title">${escapeHtml(day.name||('День '+day.day))}</div>${day.date?`<div class="day-date">${escapeHtml(day.date)}</div>`:''}<div class="info">Выполнено: ${done} · Осталось: <b>${remaining}</b></div></div><div class="arrow">›</div></div></button>`;
+  });
+
+  document.getElementById('app').innerHTML=html;
+}
+
+function openDay(dayId){
+  currentDayId=dayId;
+  renderLocations();
+}
+
+/* ===================== LOCATIONS ===================== */
+
 function renderLocations(){
   currentLocationId=null;
   currentTaskId=null;
 
-  let html='<div class="title">📸 '+escapeHtml(appData.event.name)+'</div><div class="subtitle">Выберите локацию</div>';
+  const day=appData.days.find(x=>x.dayId===currentDayId);
+  const locations=appData.locations
+    .filter(x=>x.dayId===currentDayId)
+    .sort((a,b)=>Number(a.order)-Number(b.order));
 
-  [...appData.locations].sort((a,b)=>Number(a.order)-Number(b.order)).forEach(location=>{
+  let html=`<button class="back" onclick="renderDays()">‹ К дням</button><div class="title">${escapeHtml(day?.name||'День')}</div><div class="subtitle">Выберите локацию</div>`;
+
+  locations.forEach(location=>{
     const remaining=appData.tasks.filter(t=>t.locationId===location.locationId&&t.status!=='DONE').length;
     html+=`<button class="card" onclick="openLocation('${escapeJs(location.locationId)}')"><div class="row"><div class="number">${escapeHtml(location.number)}</div><div class="content"><div class="card-title">${escapeHtml(location.name)}</div><div class="info">Осталось: <b>${remaining}</b></div></div><div class="arrow">›</div></div></button>`;
   });
+
+  if(!locations.length)html+='<div class="card"><div class="card-title">Для этого дня локации пока не добавлены</div></div>';
 
   document.getElementById('app').innerHTML=html;
 }
@@ -92,6 +116,8 @@ function openLocation(id){
   renderTasks();
 }
 
+/* ===================== TASKS ===================== */
+
 function renderTasks(){
   const location=appData.locations.find(x=>x.locationId===currentLocationId);
   if(!location){renderLocations();return}
@@ -100,18 +126,23 @@ function renderTasks(){
     .filter(t=>t.locationId===currentLocationId&&t.status!=='DONE')
     .sort((a,b)=>String(a.number).localeCompare(String(b.number),undefined,{numeric:true}));
 
-  let html=`<button class="back" onclick="renderLocations()">‹ Назад</button><div class="title">${escapeHtml(location.number)}. ${escapeHtml(location.name)}</div><div class="subtitle">Осталось заданий: ${tasks.length}</div>`;
+  let html=`<button class="back" onclick="renderLocations()">‹ К локациям</button><div class="title">${escapeHtml(location.number)}. ${escapeHtml(location.name)}</div><div class="subtitle">Осталось заданий: ${tasks.length}</div>`;
 
   if(!tasks.length)html+='<div class="card"><div class="card-title">✅ Всё выполнено</div></div>';
 
   tasks.forEach(task=>{
     let status='<div class="info">Готово к выполнению</div>';
+
     if(task.status==='IN_PROGRESS'){
       status=String(task.reservedBy)===telegramUserId
         ?'<div class="mine">● Ваше задание</div>'
-        :'<div class="busy">⏳ Выполняется</div>';
+        :'<div class="busy">⏳ Выполняется другим участником</div>';
     }
-    const req=task.minPhotos>0?`<div class="requirement">Минимум фото: ${task.minPhotos}${task.maxPhotos>0?' · максимум: '+task.maxPhotos:''}</div>`:'';
+
+    const req=task.minPhotos>0
+      ?`<div class="requirement">Минимум: ${task.minPhotos}${task.maxPhotos>0?' · максимум: '+task.maxPhotos:''}</div>`
+      :'';
+
     html+=`<button class="card" onclick="selectTask('${escapeJs(task.taskId)}')"><div class="row"><div class="number">${escapeHtml(task.number)}</div><div class="content"><div class="card-title">${escapeHtml(task.name)}</div>${status}${req}</div><div class="arrow">›</div></div></button>`;
   });
 
@@ -143,15 +174,15 @@ async function selectTask(taskId){
   }
 }
 
-function currentTask(){
-  return appData?.tasks?.find(x=>x.taskId===currentTaskId);
-}
+function currentTask(){return appData?.tasks?.find(x=>x.taskId===currentTaskId)}
 
 function taskPhotos(){
   return (appData?.photos||[])
     .filter(x=>x.taskId===currentTaskId)
     .sort((a,b)=>Number(a.number)-Number(b.number));
 }
+
+/* ===================== TASK SCREEN ===================== */
 
 function renderTaskScreen(){
   const task=currentTask();
@@ -165,7 +196,11 @@ function renderTaskScreen(){
 
   let photoHtml='';
   photos.forEach(photo=>{
-    photoHtml+=`<div class="photo-item"><div class="photo-file">📷 ${escapeHtml(photo.fileName)}</div><button class="delete-photo" onclick="deletePhoto('${escapeJs(photo.photoId)}')" ${uploading?'disabled':''}>🗑</button></div>`;
+    const image=photo.thumbUrl
+      ?`<img src="${escapeHtml(photo.thumbUrl)}" alt="${escapeHtml(photo.fileName)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="photo-placeholder" style="display:none">📷<br>${escapeHtml(photo.fileName)}</div>`
+      :`<div class="photo-placeholder">📷<br>${escapeHtml(photo.fileName)}</div>`;
+
+    photoHtml+=`<div class="photo-tile">${image}<button class="delete-photo" onclick="deletePhoto('${escapeJs(photo.photoId)}')" ${uploading?'disabled':''}>🗑</button><div class="photo-caption">${escapeHtml(photo.fileName)}</div></div>`;
   });
 
   const instruction=task.instruction
@@ -174,7 +209,7 @@ function renderTaskScreen(){
 
   const requirementText=task.minPhotos>0
     ?`Нужно минимум ${task.minPhotos} фото${task.maxPhotos>0?', максимум '+task.maxPhotos:''}.`
-    :'Количество не ограничено. Для завершения нужна минимум 1 фотография.';
+    :'Для завершения нужна минимум 1 фотография.';
 
   document.getElementById('app').innerHTML=`
     <button class="back" onclick="renderTasks()">‹ К списку</button>
@@ -183,24 +218,18 @@ function renderTaskScreen(){
     <div class="subtitle">${escapeHtml(requirementText)}</div>
     ${instruction}
     <div class="photo-counter">📷 Фотографий: <b>${count}</b></div>
-    <div class="photo-list">${photoHtml}</div>
-
+    <div class="photo-grid">${photoHtml}</div>
     <button class="action photo-button" onclick="openCamera()" ${uploading||maxReached?'disabled':''}>📷 Сделать фото</button>
     <button class="action photo-button" onclick="openGallery()" ${uploading||maxReached?'disabled':''}>🖼 Выбрать фото</button>
     <button class="action finish-button" onclick="finishTask()" ${!enough||uploading?'disabled':''}>✅ Завершить</button>
-    <button class="action cancel-button" onclick="cancelTask()" ${count>0||uploading?'disabled':''}>↩️ Отказаться от задания</button>
+    <button class="action cancel-button" onclick="cancelTask()" ${uploading?'disabled':''}>↩️ Отказаться от задания</button>
   `;
 }
 
-function openCamera(){
-  if(uploading)return;
-  document.getElementById('cameraInput').click();
-}
+/* ===================== PHOTOS ===================== */
 
-function openGallery(){
-  if(uploading)return;
-  document.getElementById('galleryInput').click();
-}
+function openCamera(){if(!uploading)document.getElementById('cameraInput').click()}
+function openGallery(){if(!uploading)document.getElementById('galleryInput').click()}
 
 document.getElementById('cameraInput').addEventListener('change',async event=>{
   const file=event.target.files?.[0];
@@ -224,7 +253,6 @@ async function uploadFiles(files){
     const remaining=task.maxPhotos-taskPhotos().length;
     if(remaining<=0){alert('Достигнуто максимальное количество фотографий.');return}
     allowed=files.slice(0,remaining);
-    if(allowed.length<files.length)alert('Будут загружены только '+allowed.length+' фото — достигнут лимит задания.');
   }
 
   uploading=true;
@@ -234,14 +262,18 @@ async function uploadFiles(files){
     for(let i=0;i<allowed.length;i++){
       showLoading('Загружаем фото '+(i+1)+' из '+allowed.length+'…');
       const image=await compressImage(allowed[i]);
+
       const result=await postApi({
         action:'uploadPhoto',
         taskId:currentTaskId,
         imageBase64:image
       });
+
       if(!result.ok)throw new Error(result.code||result.error||'Ошибка загрузки');
     }
+
     await refreshDataOnly();
+
   }catch(error){
     alert('Не удалось загрузить фото: '+error.message);
     await safeRefresh();
@@ -252,18 +284,22 @@ async function uploadFiles(files){
 }
 
 async function deletePhoto(photoId){
-  if(!confirm('Удалить ошибочно загруженное фото?'))return;
+  if(!confirm('Удалить эту фотографию?'))return;
 
   try{
     showLoading('Удаляем фото…');
+
     const result=await postApi({
       action:'deletePhoto',
       taskId:currentTaskId,
-      photoId
+      photoId:photoId
     });
+
     if(!result.ok)throw new Error(result.code||result.error||'Ошибка удаления');
+
     await refreshDataOnly();
     renderTaskScreen();
+
   }catch(error){
     alert('Не удалось удалить фото: '+error.message);
     await safeRefresh();
@@ -271,11 +307,14 @@ async function deletePhoto(photoId){
   }
 }
 
+/* ===================== FINISH / CANCEL ===================== */
+
 async function finishTask(){
   const task=currentTask();
   if(!task)return;
 
   const required=task.minPhotos>0?task.minPhotos:1;
+
   if(taskPhotos().length<required){
     alert('Нужно загрузить минимум '+required+' фото.');
     return;
@@ -285,11 +324,18 @@ async function finishTask(){
 
   try{
     showLoading('Завершаем…');
-    const result=await postApi({action:'finishTask',taskId:currentTaskId});
+
+    const result=await postApi({
+      action:'finishTask',
+      taskId:currentTaskId
+    });
+
     if(!result.ok)throw new Error(result.code||result.error||'Ошибка завершения');
+
     currentTaskId=null;
     await refreshDataOnly();
     renderTasks();
+
   }catch(error){
     alert('Не удалось завершить: '+error.message);
     await safeRefresh();
@@ -298,24 +344,23 @@ async function finishTask(){
 }
 
 async function cancelTask(){
-  const task=currentTask();
-  if(!task)return;
-
-  if(taskPhotos().length>0){
-    alert('Сначала удалите загруженные фотографии.');
-    return;
-  }
-
-  if(!confirm('Отказаться от этого задания?'))return;
+  if(!currentTaskId)return;
+  if(!confirm('Отказаться от задания? Загруженные в него фотографии будут удалены.'))return;
 
   try{
     showLoading('Освобождаем задание…');
-    const result=await postApi({action:'cancelTask',taskId:currentTaskId});
+
+    const result=await postApi({
+      action:'cancelTask',
+      taskId:currentTaskId
+    });
+
     if(!result.ok)throw new Error(result.code||result.error||'Ошибка отказа');
 
-    // Important: keep currentLocationId, only clear currentTaskId.
     currentTaskId=null;
     await refreshDataOnly();
+
+    // Stay inside the same location and show the task as OPEN again.
     renderTasks();
 
   }catch(error){
@@ -325,17 +370,17 @@ async function cancelTask(){
   }
 }
 
-async function postApi(data){
-  const payload={
-    ...data,
-    initData,
-    event:eventKey
-  };
+/* ===================== API ===================== */
 
+async function postApi(data){
   const response=await fetch(API_URL,{
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(payload)
+    body:JSON.stringify({
+      ...data,
+      initData:initData,
+      event:eventKey
+    })
   });
 
   const text=await response.text();
@@ -348,38 +393,59 @@ async function postApi(data){
 }
 
 async function refreshDataOnly(){
-  const response=await fetch(API_URL+'?action=data&t='+Date.now()+eventQuery());
-  const result=await response.json();
+  const response=await fetch(
+    API_URL+'?action=data&t='+Date.now()+eventQuery()
+  );
+
+  const text=await response.text();
+  let result;
+
+  try{
+    result=JSON.parse(text);
+  }catch(error){
+    throw new Error('Сервер вернул не JSON: '+text.substring(0,250));
+  }
+
   if(!result.ok)throw new Error(result.code||result.error||'Ошибка обновления');
   appData=result.data;
 }
 
-async function safeRefresh(){
-  try{await refreshDataOnly()}catch(e){}
-}
+async function safeRefresh(){try{await refreshDataOnly()}catch(e){}}
 
 function compressImage(file){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
+
     reader.onerror=reject;
+
     reader.onload=e=>{
       const img=new Image();
+
       img.onerror=reject;
+
       img.onload=()=>{
         const MAX=1600;
-        let width=img.width,height=img.height;
+        let width=img.width;
+        let height=img.height;
+
         if(width>MAX||height>MAX){
           const ratio=Math.min(MAX/width,MAX/height);
           width=Math.round(width*ratio);
           height=Math.round(height*ratio);
         }
+
         const canvas=document.createElement('canvas');
-        canvas.width=width;canvas.height=height;
+        canvas.width=width;
+        canvas.height=height;
+
         canvas.getContext('2d').drawImage(img,0,0,width,height);
+
         resolve(canvas.toDataURL('image/jpeg',.82));
       };
+
       img.src=e.target.result;
     };
+
     reader.readAsDataURL(file);
   });
 }
@@ -398,7 +464,9 @@ function escapeHtml(value){
 }
 
 function escapeJs(value){
-  return String(value??'').replaceAll('\\','\\\\').replaceAll("'","\\'");
+  return String(value??'')
+    .replaceAll('\\','\\\\')
+    .replaceAll("'","\\'");
 }
 
 loadData();
