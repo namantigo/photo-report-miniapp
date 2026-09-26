@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Photo Report Test</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 25px;
+      background: #f4f4f4;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+    }
+
+    .ok {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .value {
+      margin-top: 8px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <div class="ok">
+    📸 Photo Report Mini App
+  </div>
+</div>
+
+<div class="box">
+  <b>Telegram:</b>
+  <div id="telegram" class="value">проверяем...</div>
+</div>
+
+<div class="box">
+  <b>User ID:</b>
+  <div id="userid" class="value">—</div>
+</div>
+
+<div class="box">
+  <b>Platform:</b>
+  <div id="platform" class="value">—</div>
+</div>
+
+<div class="box">
+  <b>initData:</b>
+  <div id="initdata" class="value">—</div>
+</div>
+
+
+<script>
+
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+const hasInitData =
+  !!tg.initData;
+
+const user =
+  tg.initDataUnsafe &&
+  tg.initDataUnsafe.user
+    ? tg.initDataUnsafe.user
+    : null;
+
+
+document.getElementById("telegram")
+  .textContent =
+    hasInitData
+      ? "✅ ДАННЫЕ ПОЛУЧЕНЫ"
+      : "❌ НЕТ ДАННЫХ";
+
+
+document.getElementById("userid")
+  .textContent =
+    user
+      ? user.id
+      : "НЕ ПОЛУЧЕН";
+
+
+document.getElementById("platform")
+  .textContent =
+    tg.platform || "не определена";
+
+
+document.getElementById("initdata")
+  .textContent =
+    hasInitData
+      ? "Есть (" + tg.initData.length + " символов)"
+      : "Пусто";
+
+</script>
+
+</body>
+</html>
