@@ -289,213 +289,95 @@
 
   function renderTasks() {
 
-    const tasks = appData.tasks
-      .filter(
-        task =>
-          task.locationId === currentLocation.locationId &&
-          task.status !== 'DONE'
-      )
-      .sort((a, b) =>
-
-async function selectTask(taskId) {
-
-  const task = appData.tasks.find(
-    item => item.taskId === taskId
-  );
-
-  if (!task) return;
-
-  if (task.status === 'IN_PROGRESS') {
-    alert('Это задание уже выполняется.');
-    return;
-  }
-
-  const initData =
-    window.Telegram?.WebApp?.initData || '';
-
-  if (!initData) {
-    alert(
-      'Нет данных Telegram. Откройте фотоотчёт через кнопку бота.'
-    );
-    return;
-  }
-
-  try {
-
-    const response = await fetch(
-      API_URL,
-      {
-        method: 'POST',
-
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
-
-        body: JSON.stringify({
-          action: 'reserve',
-          taskId: taskId,
-          initData: initData
-        })
-      }
+  const tasks = appData.tasks
+    .filter(
+      task =>
+        task.locationId === currentLocation.locationId &&
+        task.status !== 'DONE'
+    )
+    .sort((a, b) =>
+      compareTaskNumbers(a.number, b.number)
     );
 
-    const result =
-      await response.json();
+  let html = `
+    <button class="back" onclick="renderLocations()">
+      ‹ Назад
+    </button>
 
-    if (
-      result.ok &&
-      (
-        result.code === 'RESERVED' ||
-        result.code === 'ALREADY_RESERVED'
-      )
-    ) {
+    <div class="header">
+      <div class="title">
+        ${escapeHtml(currentLocation.number)}.
+        ${escapeHtml(currentLocation.name)}
+      </div>
 
-      task.status = 'IN_PROGRESS';
+      <div class="subtitle">
+        Заданий:
+        <b>${tasks.length}</b>
+      </div>
+    </div>
+  `;
 
-      const tgUser =
-        window.Telegram.WebApp
-          .initDataUnsafe?.user;
+  if (tasks.length === 0) {
 
-      if (tgUser) {
-        task.reservedBy =
-          String(tgUser.id);
-      }
-
-      alert('Задание принято');
-
-      renderTasks();
-
-      return;
-    }
-
-    if (result.code === 'BUSY') {
-      alert(
-        'Это задание уже взял другой участник.'
-      );
-    }
-
-    else if (
-      result.code === 'ACTIVE_TASK_EXISTS'
-    ) {
-      alert(
-        'Сначала завершите текущее задание.'
-      );
-    }
-
-    else if (result.code === 'DONE') {
-      alert(
-        'Это задание уже выполнено.'
-      );
-    }
-
-    else {
-      alert(
-        'Не удалось взять задание: ' +
-        (result.code || result.error || 'ошибка')
-      );
-    }
-
-    // Получаем свежее состояние
-    await loadData();
-
-    if (currentLocation) {
-      renderTasks();
-    }
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      'Ошибка связи с сервером: ' +
-      error.message
-    );
-  }
-}
-
-function testTaskClick(taskId) {
-  alert('Нажато задание: ' + taskId);
-}
-        
-        compareTaskNumbers(a.number, b.number)
-      );
-
-    let html = `
-      <button class="back" onclick="renderLocations()">
-        ‹ Назад
-      </button>
-
-      <div class="header">
-        <div class="title">
-          ${escapeHtml(currentLocation.number)}.
-          ${escapeHtml(currentLocation.name)}
-        </div>
-
-        <div class="subtitle">
-          Заданий:
-          <b>${tasks.length}</b>
+    html += `
+      <div class="card">
+        <div class="card-title">
+          ✅ Всё выполнено
         </div>
       </div>
     `;
 
-    if (tasks.length === 0) {
+  } else {
+
+    tasks.forEach(task => {
+
+      let statusText = 'Готово к выполнению';
+      let statusClass = 'open';
+
+      if (task.status === 'IN_PROGRESS') {
+        statusText = '⏳ Выполняется';
+        statusClass = 'busy';
+      }
 
       html += `
-        <div class="card">
-          <div class="card-title">
-            ✅ Всё выполнено
-          </div>
-        </div>
-      `;
+        <button
+          type="button"
+          class="card"
+          onclick="testTaskClick('${escapeJs(task.taskId)}')"
+        >
+          <div class="row">
 
-    } else {
+            <div class="number">
+              ${escapeHtml(task.number)}
+            </div>
 
-      tasks.forEach(task => {
+            <div class="content">
 
-        let statusText = 'Готово к выполнению';
-        let statusClass = 'open';
-
-        if (task.status === 'IN_PROGRESS') {
-          statusText = '⏳ Выполняется';
-          statusClass = 'busy';
-        }
-
-        html += `
-  <button
-    type="button"
-    class="card"
-    onclick="testTaskClick('${escapeJs(task.taskId)}')"
-  >
-            <div class="row">
-
-              <div class="number">
-                ${escapeHtml(task.number)}
+              <div class="card-title">
+                ${escapeHtml(task.name)}
               </div>
 
-              <div class="content">
-
-                <div class="card-title">
-                  ${escapeHtml(task.name)}
-                </div>
-
-                <div class="status ${statusClass}">
-                  ${statusText}
-                </div>
-
+              <div class="status ${statusClass}">
+                ${statusText}
               </div>
-
-              <div class="arrow">›</div>
 
             </div>
-          </button>
-        `;
-      });
-    }
 
-    document.getElementById('app').innerHTML = html;
+            <div class="arrow">›</div>
+
+          </div>
+        </button>
+      `;
+    });
   }
 
+  document.getElementById('app').innerHTML = html;
+}
 
+
+function testTaskClick(taskId) {
+  alert('Нажато задание: ' + taskId);
+}
   function compareTaskNumbers(a, b) {
 
     return String(a).localeCompare(
