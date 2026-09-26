@@ -412,6 +412,10 @@ async function selectTask(taskId) {
     );
   }
 }
+
+function testTaskClick(taskId) {
+  alert('Нажато задание: ' + taskId);
+}
         
         compareTaskNumbers(a.number, b.number)
       );
@@ -457,10 +461,11 @@ async function selectTask(taskId) {
         }
 
         html += `
-          <button
-  class="card"
-  onclick="selectTask('${escapeJs(task.taskId)}')"
->
+  <button
+    type="button"
+    class="card"
+    onclick="testTaskClick('${escapeJs(task.taskId)}')"
+  >
             <div class="row">
 
               <div class="number">
