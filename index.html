@@ -282,6 +282,17 @@ button.card:active {
   cursor: default;
 }
 
+.cancel-button {
+  background: transparent;
+  color: #d14343;
+  border: 1px solid #d14343;
+}
+
+.cancel-button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
 .uploading {
 
   text-align: center;
@@ -1418,6 +1429,85 @@ async function finishTask() {
   }
 }
 
+
+
+
+/* =====================
+   CANCEL TASK
+===================== */
+
+async function cancelTask() {
+
+  const task =
+    appData.tasks.find(
+      x =>
+        x.taskId ===
+        currentTaskId
+    );
+
+  if (!task) return;
+
+  if (
+    Number(
+      task.photoCount || 0
+    ) > 0
+  ) {
+    alert(
+      'После загрузки фотографий отказаться от задания нельзя.'
+    );
+    return;
+  }
+
+  if (
+    !confirm(
+      'Отказаться от этого задания?'
+    )
+  ) {
+    return;
+  }
+
+  try {
+
+    showLoading(
+      'Освобождаем задание…'
+    );
+
+    const result =
+      await postApi({
+        action:
+          'cancelTask',
+
+        taskId:
+          currentTaskId,
+
+        initData:
+          initData
+      });
+
+    if (!result.ok) {
+      throw new Error(
+        result.code ||
+        result.error ||
+        'Ошибка отказа'
+      );
+    }
+
+    currentTaskId = null;
+
+    await refreshDataOnly();
+
+    renderTasks();
+
+  } catch (error) {
+
+    alert(
+      'Не удалось отказаться: ' +
+      error.message
+    );
+
+    renderTaskScreen();
+  }
+}
 
 
 /* =====================
