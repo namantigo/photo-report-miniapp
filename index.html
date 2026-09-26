@@ -989,6 +989,117 @@ function renderTaskScreen() {
    CAMERA
 ===================== */
 
+function openGallery() {
+
+  if (uploading) return;
+
+  document
+    .getElementById('galleryInput')
+    .click();
+}
+
+document
+  .getElementById('galleryInput')
+  .addEventListener(
+    'change',
+    async function(event) {
+
+      const files =
+        Array.from(
+          event.target.files || []
+        );
+
+      if (!files.length) {
+        return;
+      }
+
+      uploading = true;
+
+      renderTaskScreen();
+
+      try {
+
+        for (
+          let i = 0;
+          i < files.length;
+          i++
+        ) {
+
+          showLoading(
+            'Загружаем фото ' +
+            (i + 1) +
+            ' из ' +
+            files.length +
+            '…'
+          );
+
+
+          const image =
+            await compressImage(
+              files[i]
+            );
+
+
+          const result =
+            await postApi({
+
+              action:
+                'uploadPhoto',
+
+              taskId:
+                currentTaskId,
+
+              initData:
+                initData,
+
+              imageBase64:
+                image
+            });
+
+
+          if (!result.ok) {
+
+            throw new Error(
+              result.code ||
+              result.error ||
+              'Ошибка загрузки'
+            );
+          }
+        }
+
+
+        await refreshDataOnly();
+
+
+      } catch (error) {
+
+        alert(
+          'Не удалось загрузить фото: ' +
+          error.message
+        );
+
+
+        // Получаем актуальный PhotoCount,
+        // поскольку часть фотографий могла
+        // успеть загрузиться.
+
+        try {
+          await refreshDataOnly();
+        } catch (_) {}
+
+
+      } finally {
+
+        uploading = false;
+
+        event.target.value = '';
+
+        renderTaskScreen();
+      }
+    }
+  );
+
+  
 function openCamera() {
 
   if (uploading) return;
