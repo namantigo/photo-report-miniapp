@@ -23,7 +23,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app"><div style="padding:24px;text-align:center;opacity:.65">Фотоотчёт</div></div>
 <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 <input id="galleryInput" type="file" accept="image/*" multiple hidden>
 <div id="overlay"></div>
@@ -54,7 +54,21 @@ async function api(body){
   if(!j.ok)throw new Error(j.code||j.error||'Ошибка');return j;
 }
 function toast(s){const d=document.createElement('div');d.className='toast';d.textContent=s;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
-function top(title,sub,back=''){return `<div class="top"><div><div class="title">${esc(title)}</div>${sub?`<div class="subtitle">${esc(sub)}</div>`:''}</div><button class="icon-btn" onclick="openAdmin()">⚙️</button></div>${back?`<button class="back" onclick="${back}">‹ Назад</button>`:''}`}
+function headerHtml(title,sub,back=''){return `<div class="top"><div><div class="title">${esc(title)}</div>${sub?`<div class="subtitle">${esc(sub)}</div>`:''}</div><button class="icon-btn" onclick="openAdmin()">⚙️</button></div>${back?`<button class="back" onclick="${back}">‹ Назад</button>`:''}`}
+
+window.addEventListener('error',function(e){
+  const app=document.getElementById('app');
+  if(app){
+    app.innerHTML='<div class="error"><b>Ошибка запуска приложения</b><br><br>'+esc(e.message||'JavaScript error')+'</div>';
+  }
+});
+window.addEventListener('unhandledrejection',function(e){
+  const app=document.getElementById('app');
+  const msg=e.reason && e.reason.message ? e.reason.message : String(e.reason||'Ошибка');
+  if(app){
+    app.innerHTML='<div class="error"><b>Ошибка запуска приложения</b><br><br>'+esc(msg)+'</div>';
+  }
+});
 
 async function start(){
   $('app').innerHTML='';
@@ -64,7 +78,7 @@ async function start(){
 /* Fast navigation: all screens render from memory; no GET between screens. */
 function renderDays(){
   taskId=locationId=dayId=null;
-  let h=top('📸 '+data.event.name,'Выберите день фотоотчёта');
+  let h=headerHtml('📸 '+data.event.name,'Выберите день фотоотчёта');
   const days=[...(data.days||[])].sort((a,b)=>a.order-b.order);
   days.forEach(d=>{
     const ts=data.tasks.filter(t=>t.dayId===d.dayId),left=ts.filter(t=>t.status!=='DONE').length;
@@ -75,7 +89,7 @@ function renderDays(){
 function openDay(id){dayId=id;renderLocations()}
 function renderLocations(){
   locationId=taskId=null;const d=data.days.find(x=>x.dayId===dayId);
-  let h=top(d?.name||'День','Выберите локацию','renderDays()');
+  let h=headerHtml(d?.name||'День','Выберите локацию','renderDays()');
   data.locations.filter(x=>x.dayId===dayId).sort((a,b)=>a.order-b.order).forEach(l=>{
     const left=data.tasks.filter(t=>t.locationId===l.locationId&&t.status!=='DONE').length;
     h+=`<button class="card" onclick="openLocation('${js(l.locationId)}')"><div class="row"><div class="number">${esc(l.number)}</div><div class="content"><div class="card-title">${esc(l.name)}</div><div class="info">Осталось: ${left}</div></div><div class="arrow">›</div></div></button>`;
@@ -84,7 +98,7 @@ function renderLocations(){
 function openLocation(id){locationId=id;renderTasks()}
 function renderTasks(){
   taskId=null;const l=data.locations.find(x=>x.locationId===locationId);
-  let h=top((l?.number||'')+' '+(l?.name||''),'Задания','renderLocations()');
+  let h=headerHtml((l?.number||'')+' '+(l?.name||''),'Задания','renderLocations()');
   const ts=data.tasks.filter(t=>t.locationId===locationId&&t.status!=='DONE').sort((a,b)=>String(a.number).localeCompare(String(b.number),undefined,{numeric:true}));
   if(!ts.length)h+='<div class="empty">✅ Всё выполнено</div>';
   ts.forEach(t=>{
