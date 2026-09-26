@@ -540,13 +540,17 @@ async function testTaskClick(taskId) {
       }
     );
 
-    const result =
-      await response.json();
+    const text =
+  await response.text();
 
-    console.log(
-      'reserve result:',
-      result
-    );
+alert(
+  'HTTP: ' +
+  response.status +
+  '\n\n' +
+  text.substring(0, 500)
+);
+
+return;
 
 
     if (
