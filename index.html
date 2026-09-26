@@ -392,13 +392,23 @@ async function loadData() {
       await response.json();
 
 
-    if (!result.ok) {
+  if (!result.ok) {
 
-      throw new Error(
-        result.error ||
-        'Ошибка API'
-      );
-    }
+  alert(
+    'Ответ сервера:\n' +
+    JSON.stringify(
+      result,
+      null,
+      2
+    )
+  );
+
+  throw new Error(
+    result.code ||
+    result.error ||
+    'Ошибка загрузки'
+  );
+}
 
 
     appData =
@@ -1277,16 +1287,13 @@ async function finishTask() {
    API
 ===================== */
 
-async function postApi(
-  data
-) {
+async function postApi(data) {
 
   const response =
     await fetch(
       API_URL,
       {
-        method:
-          'POST',
+        method: 'POST',
 
         headers: {
           'Content-Type':
@@ -1294,29 +1301,35 @@ async function postApi(
         },
 
         body:
-          JSON.stringify(
-            data
-          )
+          JSON.stringify(data)
       }
     );
-
 
   const text =
     await response.text();
 
+  let result;
 
   try {
 
-    return JSON.parse(
-      text
-    );
+    result =
+      JSON.parse(text);
 
   } catch (error) {
 
+    alert(
+      'HTTP: ' +
+      response.status +
+      '\n\n' +
+      text.substring(0, 1000)
+    );
+
     throw new Error(
-      'Сервер вернул некорректный ответ'
+      'Сервер вернул не JSON'
     );
   }
+
+  return result;
 }
 
 
