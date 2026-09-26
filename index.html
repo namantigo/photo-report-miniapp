@@ -332,6 +332,14 @@ button.card:active {
   hidden
 >
 
+  <input
+  id="galleryInput"
+  type="file"
+  accept="image/*"
+  multiple
+  hidden
+>
+
 
 <script>
 
@@ -913,16 +921,21 @@ function renderTaskScreen() {
 
 
         <button
-          class="action photo-button"
-          onclick="openCamera()"
-          ${uploading
-            ? 'disabled'
-            : ''}
-        >
+  class="action photo-button"
+  onclick="openCamera()"
+  ${uploading ? 'disabled' : ''}
+>
+  📷 Сделать фото
+</button>
 
-          📷 Добавить фото
 
-        </button>
+<button
+  class="action photo-button"
+  onclick="openGallery()"
+  ${uploading ? 'disabled' : ''}
+>
+  🖼 Выбрать фото
+</button>
 
 
         <button
@@ -941,7 +954,20 @@ function renderTaskScreen() {
           ✅ Завершить
 
         </button>
+<button
+  class="action cancel-button"
+  onclick="cancelTask()"
 
+  ${
+    photoCount > 0 ||
+    uploading
+
+      ? 'disabled'
+      : ''
+  }
+>
+  ↩️ Отказаться от задания
+</button>
 
         ${
           uploading
