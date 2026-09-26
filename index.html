@@ -493,12 +493,167 @@ function renderTasks() {
    TEST CLICK
 ========================= */
 
-function testTaskClick(taskId) {
+async function testTaskClick(taskId) {
 
-  alert(
-    'Нажато задание: ' +
-    taskId
+  const task = appData.tasks.find(
+    item => item.taskId === taskId
   );
+
+  if (!task) {
+    alert('Задание не найдено');
+    return;
+  }
+
+  // Если уже занято
+  if (task.status === 'IN_PROGRESS') {
+    alert('Это задание уже выполняется');
+    return;
+  }
+
+  const initData =
+    window.Telegram?.WebApp?.initData || '';
+
+  if (!initData) {
+    alert(
+      'Нет данных Telegram. Откройте фотоотчёт через кнопку бота.'
+    );
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      API_URL,
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type':
+            'text/plain;charset=utf-8'
+        },
+
+        body: JSON.stringify({
+          action: 'reserve',
+          taskId: taskId,
+          initData: initData
+        })
+      }
+    );
+
+    const result =
+      await response.json();
+
+    console.log(
+      'reserve result:',
+      result
+    );
+
+
+    if (
+      result.ok &&
+      (
+        result.code === 'RESERVED' ||
+        result.code === 'ALREADY_RESERVED'
+      )
+    ) {
+
+      alert('✅ Задание принято');
+
+      // Получаем свежее состояние из Sheets
+      await refreshData();
+
+      return;
+    }
+
+
+    if (result.code === 'BUSY') {
+
+      alert(
+        'Задание уже взял другой участник'
+      );
+
+    } else if (
+      result.code === 'ACTIVE_TASK_EXISTS'
+    ) {
+
+      alert(
+        'У вас уже есть активное задание'
+      );
+
+    } else if (
+      result.code === 'DONE'
+    ) {
+
+      alert(
+        'Задание уже выполнено'
+      );
+
+    } else {
+
+      alert(
+        'Ошибка: ' +
+        (
+          result.code ||
+          result.error ||
+          'неизвестная ошибка'
+        )
+      );
+    }
+
+
+    await refreshData();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      'Ошибка связи: ' +
+      error.message
+    );
+  }
+}
+
+
+async function refreshData() {
+
+  try {
+
+    const locationId =
+      currentLocationId;
+
+    const response =
+      await fetch(
+        API_URL +
+        '?action=data&t=' +
+        Date.now()
+      );
+
+    const result =
+      await response.json();
+
+    if (!result.ok) {
+      throw new Error(
+        result.error || 'Ошибка API'
+      );
+    }
+
+    appData = result.data;
+
+    currentLocationId =
+      locationId;
+
+    renderTasks();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      'Не удалось обновить задания'
+    );
+  }
 }
 
 
