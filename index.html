@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -49,28 +51,25 @@
       width: 100%;
       border: 0;
       text-align: left;
-      background: var(--tg-theme-secondary-bg-color, #ffffff);
-      color: var(--tg-theme-text-color, #111827);
+
+      background:
+        var(--tg-theme-secondary-bg-color, #ffffff);
+
+      color:
+        var(--tg-theme-text-color, #111827);
+
       border-radius: 16px;
       padding: 17px;
       margin-bottom: 11px;
+
       cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+
+      box-shadow:
+        0 1px 3px rgba(0,0,0,.06);
     }
 
     .card:active {
       transform: scale(.985);
-    }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: 650;
-    }
-
-    .card-info {
-      margin-top: 7px;
-      font-size: 14px;
-      opacity: .6;
     }
 
     .row {
@@ -80,14 +79,23 @@
     }
 
     .number {
-      min-width: 38px;
-      height: 38px;
+      min-width: 42px;
+      height: 42px;
+
+      padding: 0 6px;
+
       border-radius: 11px;
-      background: var(--tg-theme-button-color, #2481cc);
-      color: var(--tg-theme-button-text-color, #fff);
+
+      background:
+        var(--tg-theme-button-color, #2481cc);
+
+      color:
+        var(--tg-theme-button-text-color, #fff);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       font-weight: 700;
       font-size: 14px;
     }
@@ -97,18 +105,20 @@
       min-width: 0;
     }
 
-    .arrow {
-      font-size: 23px;
-      opacity: .3;
+    .card-title {
+      font-size: 18px;
+      font-weight: 650;
     }
 
+    .card-info,
     .status {
       margin-top: 6px;
-      font-size: 13px;
+      font-size: 14px;
     }
 
+    .card-info,
     .open {
-      opacity: .55;
+      opacity: .6;
     }
 
     .busy {
@@ -116,20 +126,22 @@
       font-weight: 600;
     }
 
-    .done {
-      color: #16a34a;
-      font-weight: 600;
+    .arrow {
+      font-size: 24px;
+      opacity: .3;
     }
 
     .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
       border: 0;
       background: transparent;
-      color: var(--tg-theme-link-color, #2481cc);
+
+      color:
+        var(--tg-theme-link-color, #2481cc);
+
       font-size: 16px;
-      padding: 4px 0 15px;
+
+      padding: 4px 0 16px;
+
       cursor: pointer;
     }
 
@@ -142,14 +154,10 @@
     .error {
       background: #fee2e2;
       color: #991b1b;
-      padding: 16px;
-      border-radius: 14px;
-    }
 
-    .counter {
-      margin-left: 5px;
-      opacity: .55;
-      font-weight: 400;
+      padding: 16px;
+
+      border-radius: 14px;
     }
   </style>
 </head>
@@ -157,173 +165,258 @@
 <body>
 
 <div id="app">
-  <div class="loader">Загрузка фотоотчёта…</div>
+  <div class="loader">
+    Загрузка фотоотчёта…
+  </div>
 </div>
 
+
 <script>
-  const API_URL =
-    'https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
 
-  const tg = window.Telegram?.WebApp;
-
-  if (tg) {
-    tg.ready();
-    tg.expand();
-  }
-
-  let appData = null;
-  let currentLocation = null;
+const API_URL =
+  'https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
 
 
-  async function loadData() {
-    try {
+/* =========================
+   TELEGRAM
+========================= */
 
-      const response = await fetch(
+const tg =
+  window.Telegram &&
+  window.Telegram.WebApp
+    ? window.Telegram.WebApp
+    : null;
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+
+/* =========================
+   STATE
+========================= */
+
+let appData = null;
+let currentLocationId = null;
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadData() {
+
+  try {
+
+    const response =
+      await fetch(
         API_URL + '?action=data'
       );
 
-      if (!response.ok) {
-        throw new Error(
-          'HTTP ' + response.status
-        );
-      }
-
-      const result = await response.json();
-
-      if (!result.ok) {
-        throw new Error(
-          result.error || 'Ошибка API'
-        );
-      }
-
-      appData = result.data;
-
-      renderLocations();
-
-    } catch (error) {
-
-      console.error(error);
-
-      document.getElementById('app').innerHTML = `
-        <div class="error">
-          Не удалось загрузить данные.<br><br>
-          ${escapeHtml(error.message)}
-        </div>
-      `;
+    if (!response.ok) {
+      throw new Error(
+        'HTTP ' + response.status
+      );
     }
+
+    const result =
+      await response.json();
+
+    if (!result.ok) {
+      throw new Error(
+        result.error || 'Ошибка API'
+      );
+    }
+
+    appData = result.data;
+
+    renderLocations();
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById('app').innerHTML =
+      '<div class="error">' +
+      '<b>Ошибка загрузки</b><br><br>' +
+      escapeHtml(error.message) +
+      '</div>';
   }
+}
 
 
-  function renderLocations() {
+/* =========================
+   LOCATIONS
+========================= */
 
-    currentLocation = null;
+function renderLocations() {
 
-    const event = appData.event;
-    const locations = [...appData.locations]
-      .sort((a, b) => Number(a.order) - Number(b.order));
+  currentLocationId = null;
 
-    let html = `
-      <div class="header">
-        <div class="title">
-          📸 ${escapeHtml(event.name)}
-        </div>
+  const event = appData.event;
 
-        <div class="subtitle">
-          Выберите локацию
-        </div>
+  const locations =
+    [...appData.locations]
+      .sort(
+        (a, b) =>
+          Number(a.order) -
+          Number(b.order)
+      );
+
+  let html = `
+    <div class="header">
+
+      <div class="title">
+        📸 ${escapeHtml(event.name)}
       </div>
-    `;
 
-    locations.forEach(location => {
+      <div class="subtitle">
+        Выберите локацию
+      </div>
 
-      const tasks = appData.tasks.filter(
+    </div>
+  `;
+
+
+  locations.forEach(location => {
+
+    const tasks =
+      appData.tasks.filter(
         task =>
-          task.locationId === location.locationId &&
+          task.locationId ===
+            location.locationId &&
           task.status !== 'DONE'
       );
 
-      html += `
-        <button
-          class="card"
-          onclick="openLocation('${escapeJs(location.locationId)}')"
-        >
-          <div class="row">
+    html += `
+      <button
+        type="button"
+        class="card"
+        onclick="openLocation('${escapeJs(location.locationId)}')"
+      >
 
-            <div class="number">
-              ${escapeHtml(location.number)}
+        <div class="row">
+
+          <div class="number">
+            ${escapeHtml(location.number)}
+          </div>
+
+          <div class="content">
+
+            <div class="card-title">
+              ${escapeHtml(location.name)}
             </div>
 
-            <div class="content">
-              <div class="card-title">
-                ${escapeHtml(location.name)}
-              </div>
-
-              <div class="card-info">
-                Осталось заданий:
-                <b>${tasks.length}</b>
-              </div>
+            <div class="card-info">
+              Осталось заданий:
+              <b>${tasks.length}</b>
             </div>
-
-            <div class="arrow">›</div>
 
           </div>
-        </button>
-      `;
-    });
 
-    document.getElementById('app').innerHTML = html;
+          <div class="arrow">
+            ›
+          </div>
+
+        </div>
+
+      </button>
+    `;
+  });
+
+
+  document.getElementById('app').innerHTML =
+    html;
+}
+
+
+/* =========================
+   OPEN LOCATION
+========================= */
+
+function openLocation(locationId) {
+
+  currentLocationId = locationId;
+
+  renderTasks();
+}
+
+
+/* =========================
+   TASKS
+========================= */
+
+function renderTasks() {
+
+  const location =
+    appData.locations.find(
+      item =>
+        item.locationId ===
+        currentLocationId
+    );
+
+  if (!location) {
+    renderLocations();
+    return;
   }
 
 
-  function openLocation(locationId) {
+  const tasks =
+    appData.tasks
 
-    currentLocation = appData.locations.find(
-      item => item.locationId === locationId
-    );
+      .filter(
+        task =>
+          task.locationId ===
+            currentLocationId &&
+          task.status !== 'DONE'
+      )
 
-    if (!currentLocation) return;
+      .sort(
+        (a, b) =>
+          compareTaskNumbers(
+            a.number,
+            b.number
+          )
+      );
 
-    renderTasks();
-  }
-
-
-  function renderTasks() {
-
-  const tasks = appData.tasks
-    .filter(
-      task =>
-        task.locationId === currentLocation.locationId &&
-        task.status !== 'DONE'
-    )
-    .sort((a, b) =>
-      compareTaskNumbers(a.number, b.number)
-    );
 
   let html = `
-    <button class="back" onclick="renderLocations()">
+
+    <button
+      type="button"
+      class="back"
+      onclick="renderLocations()"
+    >
       ‹ Назад
     </button>
 
+
     <div class="header">
+
       <div class="title">
-        ${escapeHtml(currentLocation.number)}.
-        ${escapeHtml(currentLocation.name)}
+        ${escapeHtml(location.number)}.
+        ${escapeHtml(location.name)}
       </div>
 
       <div class="subtitle">
         Заданий:
         <b>${tasks.length}</b>
       </div>
+
     </div>
   `;
+
 
   if (tasks.length === 0) {
 
     html += `
       <div class="card">
+
         <div class="card-title">
           ✅ Всё выполнено
         </div>
+
       </div>
     `;
 
@@ -331,25 +424,40 @@
 
     tasks.forEach(task => {
 
-      let statusText = 'Готово к выполнению';
-      let statusClass = 'open';
+      let statusText =
+        'Готово к выполнению';
 
-      if (task.status === 'IN_PROGRESS') {
-        statusText = '⏳ Выполняется';
-        statusClass = 'busy';
+      let statusClass =
+        'open';
+
+
+      if (
+        task.status ===
+        'IN_PROGRESS'
+      ) {
+
+        statusText =
+          '⏳ Выполняется';
+
+        statusClass =
+          'busy';
       }
 
+
       html += `
+
         <button
           type="button"
           class="card"
           onclick="testTaskClick('${escapeJs(task.taskId)}')"
         >
+
           <div class="row">
 
             <div class="number">
               ${escapeHtml(task.number)}
             </div>
+
 
             <div class="content">
 
@@ -363,54 +471,107 @@
 
             </div>
 
-            <div class="arrow">›</div>
+
+            <div class="arrow">
+              ›
+            </div>
 
           </div>
+
         </button>
       `;
     });
   }
 
-  document.getElementById('app').innerHTML = html;
+
+  document.getElementById('app').innerHTML =
+    html;
 }
 
+
+/* =========================
+   TEST CLICK
+========================= */
 
 function testTaskClick(taskId) {
-  alert('Нажато задание: ' + taskId);
+
+  alert(
+    'Нажато задание: ' +
+    taskId
+  );
 }
-  function compareTaskNumbers(a, b) {
 
-    return String(a).localeCompare(
-      String(b),
-      undefined,
-      {
-        numeric: true,
-        sensitivity: 'base'
-      }
+
+/* =========================
+   HELPERS
+========================= */
+
+function compareTaskNumbers(a, b) {
+
+  return String(a).localeCompare(
+    String(b),
+    undefined,
+    {
+      numeric: true,
+      sensitivity: 'base'
+    }
+  );
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+
+    .replaceAll(
+      '&',
+      '&amp;'
+    )
+
+    .replaceAll(
+      '<',
+      '&lt;'
+    )
+
+    .replaceAll(
+      '>',
+      '&gt;'
+    )
+
+    .replaceAll(
+      '"',
+      '&quot;'
+    )
+
+    .replaceAll(
+      "'",
+      '&#039;'
     );
-  }
+}
 
 
-  function escapeHtml(value) {
+function escapeJs(value) {
 
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
+  return String(value ?? '')
 
+    .replaceAll(
+      '\\',
+      '\\\\'
+    )
 
-  function escapeJs(value) {
-
-    return String(value ?? '')
-      .replaceAll('\\', '\\\\')
-      .replaceAll("'", "\\'");
-  }
+    .replaceAll(
+      "'",
+      "\\'"
+    );
+}
 
 
-  loadData();
+/* =========================
+   START
+========================= */
+
+loadData();
+
 </script>
 
 </body>
