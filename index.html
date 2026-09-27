@@ -2,248 +2,369 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Фотоотчёт</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>Field Report</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
+:root{
+  --bg:var(--tg-theme-bg-color,#f5f7fb);
+  --card:var(--tg-theme-secondary-bg-color,#ffffff);
+  --text:var(--tg-theme-text-color,#111827);
+  --muted:var(--tg-theme-hint-color,#6b7280);
+  --primary:var(--tg-theme-button-color,#2563eb);
+  --on-primary:var(--tg-theme-button-text-color,#ffffff);
+  --line:rgba(127,127,127,.16);
+  --ok:#16a34a;--warn:#d97706;--danger:#dc2626;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--tg-theme-bg-color,#f3f4f6);color:var(--tg-theme-text-color,#111827)}
-#app{max-width:760px;margin:auto;padding:16px}
-.top{display:flex;gap:10px;align-items:center;justify-content:space-between}.title{font-size:24px;font-weight:760;margin-bottom:5px}.subtitle{font-size:14px;opacity:.65;margin-bottom:18px;line-height:1.4}
-.icon-btn{border:0;background:var(--tg-theme-secondary-bg-color,#fff);border-radius:12px;padding:10px 12px;font-size:18px}
-.card{width:100%;border:0;text-align:left;background:var(--tg-theme-secondary-bg-color,#fff);color:inherit;border-radius:16px;padding:16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.row{display:flex;align-items:center;gap:12px}.content{flex:1;min-width:0}.number{min-width:42px;height:42px;padding:0 7px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff);font-weight:750}
-.card-title{font-size:17px;font-weight:650}.info,.req{margin-top:5px;font-size:13px;opacity:.62}.mine{margin-top:5px;font-size:13px;color:#16a34a;font-weight:650}.busy{margin-top:5px;font-size:13px;color:#d97706}.arrow{font-size:22px;opacity:.28}
-.back{border:0;background:transparent;color:var(--tg-theme-link-color,#2481cc);font-size:16px;padding:3px 0 14px}.task-name{font-size:27px;font-weight:760}.instruction{padding:13px;border-radius:13px;background:var(--tg-theme-secondary-bg-color,#fff);margin:12px 0;line-height:1.4}
-.counter{margin:14px 0 10px;font-size:16px}.action{width:100%;border:0;border-radius:14px;padding:16px;margin-top:9px;font-size:16px;font-weight:700}.blue{background:var(--tg-theme-button-color,#2481cc);color:var(--tg-theme-button-text-color,#fff)}.green{background:#16a34a;color:white}.red{background:transparent;border:1px solid #d14343;color:#d14343}.action:disabled{opacity:.4}
-.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:10px 0 16px}.tile{position:relative;aspect-ratio:1/1;border-radius:13px;overflow:hidden;background:#e5e7eb}.tile img{width:100%;height:100%;object-fit:cover}.file-tile{height:100%;padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:#4b5563;word-break:break-word}.x{position:absolute;right:5px;top:5px;width:31px;height:31px;border:0;border-radius:50%;background:rgba(17,24,39,.82);color:#fff;font-size:21px;line-height:28px}.spin{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.38)}.spinner{width:30px;height:30px;border:3px solid rgba(0,0,0,.16);border-top-color:#111827;border-radius:50%;animation:rot .7s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:12px;font-size:13px;z-index:50;max-width:90%;text-align:center}
-.error{padding:15px;border-radius:13px;background:#fee2e2;color:#991b1b}.empty{padding:22px;text-align:center;opacity:.6}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:flex-end;z-index:100}.sheet{width:100%;max-height:92vh;overflow:auto;background:var(--tg-theme-bg-color,#f3f4f6);border-radius:20px 20px 0 0;padding:18px}.field{width:100%;padding:13px;border:1px solid #d1d5db;border-radius:11px;background:var(--tg-theme-secondary-bg-color,#fff);color:inherit;margin:6px 0 10px;font-size:15px}.label{font-size:13px;font-weight:650;margin-top:8px}.admin-block{background:var(--tg-theme-secondary-bg-color,#fff);padding:13px;border-radius:14px;margin:10px 0}.small{padding:10px 12px;border:0;border-radius:10px;margin:4px 4px 4px 0}.danger-text{color:#b91c1c}.admin-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+#app{max-width:760px;margin:auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+.shell{animation:fade .18s ease}@keyframes fade{from{opacity:.4}to{opacity:1}}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.brand-left{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#0b1220,#2563eb);display:grid;place-items:center;color:white;font-size:21px;box-shadow:0 8px 24px rgba(37,99,235,.18)}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:-.3px}.brand-sub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon{width:42px;height:42px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);display:grid;place-items:center;font-size:19px}
+.page-title{font-size:28px;line-height:1.08;font-weight:820;letter-spacing:-.7px;margin:0 0 6px}.page-sub{color:var(--muted);font-size:14px;line-height:1.45;margin-bottom:18px}
+.back{border:0;background:transparent;color:var(--primary);padding:2px 0 14px;font-weight:650}
+.card{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:18px;padding:16px;margin:0 0 10px;text-align:left;box-shadow:0 3px 16px rgba(15,23,42,.035)}
+.card-row{display:flex;align-items:center;gap:13px}.badge{min-width:46px;height:46px;padding:0 8px;border-radius:14px;background:rgba(37,99,235,.1);color:var(--primary);font-weight:800;display:grid;place-items:center}
+.grow{flex:1;min-width:0}.card-title{font-size:17px;font-weight:730;line-height:1.25}.meta{font-size:13px;color:var(--muted);margin-top:5px}.mine{color:var(--ok);font-weight:650}.busy{color:var(--warn);font-weight:650}.chev{font-size:24px;color:var(--muted);opacity:.55}
+.task-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}.task-num{padding:8px 11px;border-radius:11px;background:rgba(37,99,235,.1);color:var(--primary);font-weight:800}.task-name{font-size:27px;font-weight:820;letter-spacing:-.5px;line-height:1.08}
+.note{border:1px solid var(--line);background:var(--card);padding:14px;border-radius:15px;line-height:1.45;margin:12px 0 16px}.counter{display:flex;align-items:center;justify-content:space-between;margin:16px 1px 10px}.counter strong{font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.photo{position:relative;aspect-ratio:1;border-radius:15px;overflow:hidden;background:#e5e7eb;border:1px solid var(--line)}.photo img{width:100%;height:100%;object-fit:cover;display:block}.photo-file{height:100%;display:grid;place-items:center;text-align:center;padding:10px;color:#4b5563;font-size:11px;word-break:break-word}
+.close-photo{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(15,23,42,.82);color:white;font-size:21px;line-height:28px;padding:0}
+.upload-mask{position:absolute;inset:0;background:rgba(255,255,255,.42);display:grid;place-items:center}.ring{width:31px;height:31px;border:3px solid rgba(15,23,42,.16);border-top-color:#0f172a;border-radius:50%;animation:spin .65s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.actions{display:grid;gap:9px}.btn{width:100%;border:0;border-radius:15px;padding:15px 16px;font-weight:750;font-size:16px}.btn-primary{background:var(--primary);color:var(--on-primary)}.btn-ok{background:var(--ok);color:white}.btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(220,38,38,.4)}.btn-soft{background:var(--card);color:var(--text);border:1px solid var(--line)}.btn:disabled{opacity:.42;cursor:default}
+.toast{position:fixed;z-index:300;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0f172a;color:white;padding:11px 14px;border-radius:12px;font-size:13px;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal{position:fixed;z-index:200;inset:0;background:rgba(2,6,23,.48);display:flex;align-items:flex-end}.sheet{width:100%;max-height:94vh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(0,0,0,.18)}
+.sheet-bar{width:42px;height:5px;border-radius:9px;background:rgba(127,127,127,.35);margin:0 auto 16px}.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.sheet-title{font-size:23px;font-weight:820;letter-spacing:-.4px}
+.label{font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 5px}.field{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:13px;padding:13px 14px;outline:none}.field:focus{border-color:var(--primary)}textarea.field{min-height:80px;resize:vertical}
+.block{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:13px;margin:10px 0}.block-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.mini{border:0;border-radius:10px;padding:9px 11px;background:rgba(127,127,127,.1);color:var(--text);font-size:13px;font-weight:650}.mini-danger{color:var(--danger)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.empty{text-align:center;color:var(--muted);padding:28px 10px}.error{margin:20px auto;max-width:680px;background:#fee2e2;color:#991b1b;padding:16px;border-radius:15px;line-height:1.45}
+.skeleton{height:76px;border-radius:18px;margin:10px 0;background:linear-gradient(90deg,rgba(127,127,127,.08),rgba(127,127,127,.16),rgba(127,127,127,.08));background-size:200% 100%;animation:sh 1.1s infinite}@keyframes sh{to{background-position:-200% 0}}
+.admin-event{padding:13px;border-radius:14px;background:var(--card);border:1px solid var(--line);margin:8px 0}.admin-event b{display:block}.token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);word-break:break-all;margin-top:5px}
 </style>
 </head>
 <body>
-<div id="app"><div style="padding:24px;text-align:center;opacity:.65">Фотоотчёт</div></div>
+<div id="app">
+  <div class="shell">
+    <div class="brand"><div class="brand-left"><div class="logo">F</div><div><div class="brand-name">Field Report</div><div class="brand-sub">Фотоотчёт мероприятия</div></div></div></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</div>
 <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 <input id="galleryInput" type="file" accept="image/*" multiple hidden>
 <div id="overlay"></div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
-const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand()}
-const initData=tg?.initData||'';
-const telegramUserId=tg?.initDataUnsafe?.user?.id?String(tg.initDataUnsafe.user.id):'';
-const qs=new URLSearchParams(location.search);
-const eventKey=qs.get('event')||tg?.initDataUnsafe?.start_param||'';
+(function(){
+'use strict';
 
-let data=null,dayId=null,locationId=null,taskId=null,busy=false;
-let localThumbs={};
-let adminPassword=sessionStorage.getItem('photo_admin_password')||'';
+var API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
+var tg=window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if(tg){tg.ready();tg.expand()}
 
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
-const js=s=>String(s??'').replaceAll('\\','\\\\').replaceAll("'","\\'");
+var initData=tg && tg.initData ? tg.initData : '';
+var telegramUserId=(tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) ? String(tg.initDataUnsafe.user.id) : '';
+var query='';
+try{query=window.location && window.location.search ? window.location.search : ''}catch(e){}
+var eventKey='';
+try{
+  var m=query.match(/[?&]event=([^&]+)/);
+  if(m) eventKey=decodeURIComponent(m[1]);
+}catch(e){}
+if(!eventKey && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) eventKey=String(tg.initDataUnsafe.start_param);
 
-async function apiGet(){
-  const r=await fetch(API_URL+'?action=data&t='+Date.now()+(eventKey?'&event='+encodeURIComponent(eventKey):''),{cache:'no-store'});
-  const j=await r.json();if(!j.ok)throw new Error(j.code||j.error);return j.data;
-}
-async function api(body){
-  const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({...body,initData,event:eventKey})});
-  const t=await r.text();let j;try{j=JSON.parse(t)}catch{throw new Error('Некорректный ответ сервера')}
-  if(!j.ok)throw new Error(j.code||j.error||'Ошибка');return j;
-}
-function toast(s){const d=document.createElement('div');d.className='toast';d.textContent=s;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
-function headerHtml(title,sub,back=''){return `<div class="top"><div><div class="title">${esc(title)}</div>${sub?`<div class="subtitle">${esc(sub)}</div>`:''}</div><button class="icon-btn" onclick="openAdmin()">⚙️</button></div>${back?`<button class="back" onclick="${back}">‹ Назад</button>`:''}`}
+var state={data:null,dayId:null,locationId:null,taskId:null,uploading:false};
+var localThumbs={};
+var adminSession=sessionStorage.getItem('fr_admin_session')||'';
 
-window.addEventListener('error',function(e){
-  const app=document.getElementById('app');
-  if(app){
-    app.innerHTML='<div class="error"><b>Ошибка запуска приложения</b><br><br>'+esc(e.message||'JavaScript error')+'</div>';
-  }
-});
-window.addEventListener('unhandledrejection',function(e){
-  const app=document.getElementById('app');
-  const msg=e.reason && e.reason.message ? e.reason.message : String(e.reason||'Ошибка');
-  if(app){
-    app.innerHTML='<div class="error"><b>Ошибка запуска приложения</b><br><br>'+esc(msg)+'</div>';
-  }
-});
+function el(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function js(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+function toast(s){var d=document.createElement('div');d.className='toast';d.textContent=s;document.body.appendChild(d);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},1900)}
+function modal(html){el('overlay').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheet-bar"></div>'+html+'</div></div>'}
+window.closeModal=function(){el('overlay').innerHTML=''}
 
-async function start(){
-  $('app').innerHTML='';
-  try{data=await apiGet();renderDays()}catch(e){$('app').innerHTML=`<div class="error">Ошибка: ${esc(e.message)}</div>`}
-}
-
-/* Fast navigation: all screens render from memory; no GET between screens. */
-function renderDays(){
-  taskId=locationId=dayId=null;
-  let h=headerHtml('📸 '+data.event.name,'Выберите день фотоотчёта');
-  const days=[...(data.days||[])].sort((a,b)=>a.order-b.order);
-  days.forEach(d=>{
-    const ts=data.tasks.filter(t=>t.dayId===d.dayId),left=ts.filter(t=>t.status!=='DONE').length;
-    h+=`<button class="card" onclick="openDay('${js(d.dayId)}')"><div class="row"><div class="number">${esc(d.day||d.order)}</div><div class="content"><div class="card-title">${esc(d.name)}</div><div class="info">${esc(d.date||'')} · Осталось: ${left}</div></div><div class="arrow">›</div></div></button>`;
+function request(method,url,body){
+  return new Promise(function(resolve,reject){
+    var xhr=new XMLHttpRequest();
+    xhr.open(method,url,true);
+    xhr.timeout=45000;
+    xhr.onreadystatechange=function(){
+      if(xhr.readyState!==4)return;
+      if(xhr.status<200||xhr.status>=400){reject(new Error('HTTP '+xhr.status));return}
+      try{resolve(JSON.parse(xhr.responseText))}catch(e){reject(new Error('Сервер вернул некорректный ответ'))}
+    };
+    xhr.onerror=function(){reject(new Error('Нет соединения с сервером'))};
+    xhr.ontimeout=function(){reject(new Error('Сервер отвечает слишком долго'))};
+    if(method==='POST')xhr.setRequestHeader('Content-Type','text/plain;charset=utf-8');
+    xhr.send(body?JSON.stringify(body):null);
   });
-  $('app').innerHTML=h;
 }
-function openDay(id){dayId=id;renderLocations()}
-function renderLocations(){
-  locationId=taskId=null;const d=data.days.find(x=>x.dayId===dayId);
-  let h=headerHtml(d?.name||'День','Выберите локацию','renderDays()');
-  data.locations.filter(x=>x.dayId===dayId).sort((a,b)=>a.order-b.order).forEach(l=>{
-    const left=data.tasks.filter(t=>t.locationId===l.locationId&&t.status!=='DONE').length;
-    h+=`<button class="card" onclick="openLocation('${js(l.locationId)}')"><div class="row"><div class="number">${esc(l.number)}</div><div class="content"><div class="card-title">${esc(l.name)}</div><div class="info">Осталось: ${left}</div></div><div class="arrow">›</div></div></button>`;
-  });$('app').innerHTML=h;
+function getData(){
+  var url=API_URL+'?action=data&t='+Date.now();
+  if(eventKey)url+='&event='+encodeURIComponent(eventKey);
+  return request('GET',url,null).then(function(r){
+    if(!r.ok)throw new Error(r.code||r.error||'Ошибка загрузки');
+    return r.data;
+  });
 }
-function openLocation(id){locationId=id;renderTasks()}
-function renderTasks(){
-  taskId=null;const l=data.locations.find(x=>x.locationId===locationId);
-  let h=headerHtml((l?.number||'')+' '+(l?.name||''),'Задания','renderLocations()');
-  const ts=data.tasks.filter(t=>t.locationId===locationId&&t.status!=='DONE').sort((a,b)=>String(a.number).localeCompare(String(b.number),undefined,{numeric:true}));
-  if(!ts.length)h+='<div class="empty">✅ Всё выполнено</div>';
-  ts.forEach(t=>{
-    let s='<div class="info">Готово к выполнению</div>';
-    if(t.status==='IN_PROGRESS')s=String(t.reservedBy)===telegramUserId?'<div class="mine">● Ваше задание</div>':'<div class="busy">⏳ Выполняется другим</div>';
-    h+=`<button class="card" onclick="openTask('${js(t.taskId)}')"><div class="row"><div class="number">${esc(t.number)}</div><div class="content"><div class="card-title">${esc(t.name)}</div>${s}</div><div class="arrow">›</div></div></button>`;
-  });$('app').innerHTML=h;
+function post(body){
+  var payload={};
+  Object.keys(body||{}).forEach(function(k){payload[k]=body[k]});
+  payload.initData=initData;
+  payload.event=eventKey;
+  return request('POST',API_URL,payload).then(function(r){
+    if(!r.ok)throw new Error(r.code||r.error||'Ошибка');
+    return r;
+  });
 }
-async function openTask(id){
-  const t=data.tasks.find(x=>x.taskId===id);if(!t)return;
-  if(t.status==='IN_PROGRESS'&&String(t.reservedBy)!==telegramUserId){toast('Задание уже занято');return}
-  taskId=id;
+
+function brand(sub){
+  return '<div class="brand"><div class="brand-left"><div class="logo">F</div><div><div class="brand-name">Field Report</div><div class="brand-sub">'+esc(sub||state.data.event.name)+'</div></div></div><button class="icon" onclick="openAdmin()">⚙</button></div>';
+}
+function back(fn,label){return '<button class="back" onclick="'+fn+'">‹ '+esc(label||'Назад')+'</button>'}
+
+function start(){
+  getData().then(function(d){state.data=d;renderDays()}).catch(function(e){
+    el('app').innerHTML='<div class="error"><b>Не удалось открыть фотоотчёт</b><br><br>'+esc(e.message)+'<br><br><button class="btn btn-soft" onclick="location.reload()">Повторить</button></div>';
+  });
+}
+
+window.renderDays=function(){
+  state.dayId=null;state.locationId=null;state.taskId=null;
+  var d=state.data;
+  var html='<div class="shell">'+brand(d.event.name)+'<h1 class="page-title">'+esc(d.event.name)+'</h1><div class="page-sub">Выберите день мероприятия</div>';
+  var days=(d.days||[]).slice().sort(function(a,b){return Number(a.order)-Number(b.order)});
+  days.forEach(function(day){
+    var ts=d.tasks.filter(function(t){return t.dayId===day.dayId});
+    var done=ts.filter(function(t){return t.status==='DONE'}).length;
+    html+='<button class="card" onclick="openDay(\''+js(day.dayId)+'\')"><div class="card-row"><div class="badge">'+esc(day.day||day.order)+'</div><div class="grow"><div class="card-title">'+esc(day.name||('День '+day.day))+'</div><div class="meta">'+esc(day.date||'')+(day.date?' · ':'')+'Выполнено '+done+' из '+ts.length+'</div></div><div class="chev">›</div></div></button>';
+  });
+  html+='</div>';el('app').innerHTML=html;
+}
+window.openDay=function(id){state.dayId=id;renderLocations()}
+window.renderLocations=function(){
+  state.locationId=null;state.taskId=null;
+  var d=state.data,day=d.days.find(function(x){return x.dayId===state.dayId});
+  var html='<div class="shell">'+brand(d.event.name)+back('renderDays()','К дням')+'<h1 class="page-title">'+esc(day?day.name:'День')+'</h1><div class="page-sub">Выберите зону или направление</div>';
+  var locs=d.locations.filter(function(x){return x.dayId===state.dayId}).sort(function(a,b){return Number(a.order)-Number(b.order)});
+  locs.forEach(function(l){
+    var ts=d.tasks.filter(function(t){return t.locationId===l.locationId});
+    var left=ts.filter(function(t){return t.status!=='DONE'}).length;
+    html+='<button class="card" onclick="openLocation(\''+js(l.locationId)+'\')"><div class="card-row"><div class="badge">'+esc(l.number)+'</div><div class="grow"><div class="card-title">'+esc(l.name)+'</div><div class="meta">Осталось '+left+' из '+ts.length+'</div></div><div class="chev">›</div></div></button>';
+  });
+  if(!locs.length)html+='<div class="empty">Для этого дня пока нет локаций.</div>';
+  html+='</div>';el('app').innerHTML=html;
+}
+window.openLocation=function(id){state.locationId=id;renderTasks()}
+window.renderTasks=function(){
+  state.taskId=null;
+  var d=state.data,l=d.locations.find(function(x){return x.locationId===state.locationId});
+  var html='<div class="shell">'+brand(d.event.name)+back('renderLocations()','К локациям')+'<h1 class="page-title">'+esc(l?l.name:'Задания')+'</h1><div class="page-sub">Выберите объект фотоотчёта</div>';
+  var ts=d.tasks.filter(function(t){return t.locationId===state.locationId&&t.status!=='DONE'}).sort(function(a,b){return String(a.number).localeCompare(String(b.number),undefined,{numeric:true})});
+  if(!ts.length)html+='<div class="empty">✓ Все задания выполнены</div>';
+  ts.forEach(function(t){
+    var st='<div class="meta">Готово к выполнению</div>';
+    if(t.status==='IN_PROGRESS')st=String(t.reservedBy)===telegramUserId?'<div class="meta mine">● Ваше задание</div>':'<div class="meta busy">● Выполняется другим участником</div>';
+    html+='<button class="card" onclick="openTask(\''+js(t.taskId)+'\')"><div class="card-row"><div class="badge">'+esc(t.number)+'</div><div class="grow"><div class="card-title">'+esc(t.name)+'</div>'+st+'</div><div class="chev">›</div></div></button>';
+  });
+  html+='</div>';el('app').innerHTML=html;
+}
+window.openTask=function(id){
+  var t=state.data.tasks.find(function(x){return x.taskId===id});if(!t)return;
+  if(t.status==='IN_PROGRESS'&&String(t.reservedBy)!==telegramUserId){toast('Задание уже выполняет другой участник');return}
+  state.taskId=id;
   if(t.status==='OPEN'){
-    // optimistic reservation: screen opens instantly
     t.status='IN_PROGRESS';t.reservedBy=telegramUserId;renderTask();
-    try{await api({action:'reserve',taskId:id})}catch(e){t.status='OPEN';t.reservedBy='';renderTasks();toast('Не удалось взять: '+e.message)}
+    post({action:'reserve',taskId:id}).catch(function(e){t.status='OPEN';t.reservedBy='';renderTasks();toast('Не удалось взять задание: '+e.message)});
   }else renderTask();
 }
-function photos(){return data.photos.filter(p=>p.taskId===taskId).sort((a,b)=>a.number-b.number)}
-function renderTask(){
-  const t=data.tasks.find(x=>x.taskId===taskId);if(!t){renderTasks();return}
-  const ps=photos(),required=t.minPhotos>0?t.minPhotos:1,max=t.maxPhotos>0&&ps.length>=t.maxPhotos;
-  let grid='';
-  ps.forEach(p=>{
-    const local=localThumbs[p.photoId];
-    const visual=local?`<img src="${local}">`:`<div class="file-tile">📷<br>${esc(p.fileName)}</div>`;
-    grid+=`<div class="tile">${visual}<button class="x" onclick="removePhoto('${js(p.photoId)}')">×</button></div>`;
+function taskPhotos(){
+  return state.data.photos.filter(function(p){return p.taskId===state.taskId}).sort(function(a,b){return Number(a.number)-Number(b.number)});
+}
+window.renderTask=function(){
+  var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(!t){renderTasks();return}
+  var ps=taskPhotos(),required=t.minPhotos>0?t.minPhotos:1,maxed=t.maxPhotos>0&&ps.length>=t.maxPhotos;
+  var html='<div class="shell">'+brand(state.data.event.name)+back('renderTasks()','К заданиям')+
+    '<div class="task-head"><div class="task-num">'+esc(t.number)+'</div><div class="task-name">'+esc(t.name)+'</div></div>'+
+    '<div class="page-sub">Минимум '+required+' фото'+(t.maxPhotos>0?' · максимум '+t.maxPhotos:'')+'</div>';
+  if(t.instruction)html+='<div class="note"><b>Требование</b><br>'+esc(t.instruction)+'</div>';
+  html+='<div class="counter"><span>Фотографии</span><strong>'+ps.length+'</strong></div><div class="grid">';
+  ps.forEach(function(p){
+    var src=localThumbs[p.photoId]||p.thumbnailBase64||'';
+    var visual=src?'<img src="'+esc(src)+'" alt="">':'<div class="photo-file">📷<br>'+esc(p.fileName)+'</div>';
+    html+='<div class="photo">'+visual+'<button class="close-photo" onclick="deletePhoto(\''+js(p.photoId)+'\')">×</button>'+(p.uploading?'<div class="upload-mask"><div class="ring"></div></div>':'')+'</div>';
   });
-  let h=`<button class="back" onclick="renderTasks()">‹ К заданиям</button><div class="task-name">${esc(t.number)} · ${esc(t.name)}</div><div class="subtitle">Минимум: ${required}${t.maxPhotos>0?' · максимум: '+t.maxPhotos:''}</div>`;
-  if(t.instruction)h+=`<div class="instruction"><b>Требование:</b><br>${esc(t.instruction)}</div>`;
-  h+=`<div class="counter">📷 Фотографий: <b>${ps.length}</b></div><div class="photo-grid">${grid}</div>
-  <button class="action blue" onclick="camera()" ${busy||max?'disabled':''}>📷 Сделать фото</button>
-  <button class="action blue" onclick="gallery()" ${busy||max?'disabled':''}>🖼 Выбрать фото</button>
-  <button class="action green" onclick="finish()" ${busy||ps.length<required?'disabled':''}>✅ Завершить</button>
-  <button class="action red" onclick="cancelTask()" ${busy?'disabled':''}>↩️ Отказаться</button>`;
-  $('app').innerHTML=h;
+  html+='</div><div class="actions">'+
+    '<button class="btn btn-primary" onclick="camera()" '+(state.uploading||maxed?'disabled':'')+'>📷 Сделать фото</button>'+
+    '<button class="btn btn-soft" onclick="gallery()" '+(state.uploading||maxed?'disabled':'')+'>Выбрать из галереи</button>'+
+    '<button class="btn btn-ok" onclick="finishTask()" '+(state.uploading||ps.length<required?'disabled':'')+'>Завершить задание</button>'+
+    '<button class="btn btn-danger" onclick="cancelTask()" '+(state.uploading?'disabled':'')+'>Отказаться от задания</button></div></div>';
+  el('app').innerHTML=html;
 }
-function camera(){$('cameraInput').click()}function gallery(){$('galleryInput').click()}
-$('cameraInput').onchange=async e=>{if(e.target.files[0])await uploadFiles([e.target.files[0]]);e.target.value=''}
-$('galleryInput').onchange=async e=>{const a=[...e.target.files];if(a.length)await uploadFiles(a);e.target.value=''}
+window.camera=function(){if(!state.uploading)el('cameraInput').click()}
+window.gallery=function(){if(!state.uploading)el('galleryInput').click()}
 
+el('cameraInput').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(f)uploadFiles([f]);e.target.value=''});
+el('galleryInput').addEventListener('change',function(e){var a=Array.prototype.slice.call(e.target.files||[]);if(a.length)uploadFiles(a);e.target.value=''});
+
+function makeImage(file,max,quality){
+  return new Promise(function(resolve,reject){
+    var r=new FileReader();r.onerror=reject;r.onload=function(ev){
+      var img=new Image();img.onerror=reject;img.onload=function(){
+        var w=img.width,h=img.height;
+        if(w>max||h>max){var q=Math.min(max/w,max/h);w=Math.round(w*q);h=Math.round(h*q)}
+        var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',quality));
+      };img.src=ev.target.result;
+    };r.readAsDataURL(file);
+  });
+}
 async function uploadFiles(files){
-  const t=data.tasks.find(x=>x.taskId===taskId);if(!t)return;
-  if(t.maxPhotos>0)files=files.slice(0,Math.max(0,t.maxPhotos-photos().length));
-  for(const file of files){
-    const base=await compress(file);
-    const temp='TMP_'+Date.now()+'_'+Math.random();
-    const tempPhoto={photoId:temp,taskId,number:photos().length+1,fileName:'Загрузка…'};
-    data.photos.push(tempPhoto);localThumbs[temp]=base;renderTask();
-    // spinner is added without replacing the whole page
-    const tiles=[...document.querySelectorAll('.tile')],tile=tiles[tiles.length-1];
-    if(tile){const s=document.createElement('div');s.className='spin';s.innerHTML='<div class="spinner"></div>';tile.appendChild(s)}
-    try{
-      const r=await api({action:'uploadPhoto',taskId,imageBase64:base});
-      data.photos=data.photos.filter(p=>p.photoId!==temp);
-      delete localThumbs[temp];
-      data.photos.push(r.photo);localThumbs[r.photo.photoId]=base;
-      t.photoCount=r.photoCount;renderTask();
-    }catch(e){
-      data.photos=data.photos.filter(p=>p.photoId!==temp);delete localThumbs[temp];renderTask();toast('Фото не загружено: '+e.message);break;
+  var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(!t)return;
+  if(t.maxPhotos>0)files=files.slice(0,Math.max(0,t.maxPhotos-taskPhotos().length));
+  if(!files.length)return;
+
+  state.uploading=true;
+  var prepared=[];
+  try{
+    for(var i=0;i<files.length;i++){
+      var full=await makeImage(files[i],1280,.72);
+      var thumb=await makeImage(files[i],180,.48);
+      var tempId='TMP_'+Date.now()+'_'+i;
+      state.data.photos.push({photoId:tempId,taskId:state.taskId,number:taskPhotos().length+1,fileName:'',thumbnailBase64:thumb,uploading:true});
+      localThumbs[tempId]=thumb;prepared.push({tempId:tempId,imageBase64:full,thumbnailBase64:thumb});renderTask();
     }
+
+    // Up to 3 images per request: noticeably less Apps Script overhead, without huge requests.
+    for(var start=0;start<prepared.length;start+=3){
+      var chunk=prepared.slice(start,start+3);
+      var r=await post({action:'uploadPhotos',taskId:state.taskId,photos:chunk.map(function(x){return {imageBase64:x.imageBase64,thumbnailBase64:x.thumbnailBase64}})});
+      for(var j=0;j<chunk.length;j++){
+        var temp=chunk[j],real=r.photos[j];
+        state.data.photos=state.data.photos.filter(function(p){return p.photoId!==temp.tempId});
+        delete localThumbs[temp.tempId];
+        if(real){real.uploading=false;state.data.photos.push(real);localThumbs[real.photoId]=temp.thumbnailBase64}
+      }
+      t.photoCount=r.photoCount;renderTask();
+    }
+  }catch(e){
+    prepared.forEach(function(x){state.data.photos=state.data.photos.filter(function(p){return p.photoId!==x.tempId});delete localThumbs[x.tempId]});
+    toast('Не удалось загрузить фото: '+e.message);
   }
+  state.uploading=false;renderTask();
 }
-async function removePhoto(id){
-  if(!confirm('Удалить фотографию?'))return;
-  const p=data.photos.find(x=>x.photoId===id);if(!p)return;
-  // optimistic removal
-  data.photos=data.photos.filter(x=>x.photoId!==id);renderTask();
-  try{await api({action:'deletePhoto',taskId,photoId:id});delete localThumbs[id];renumberLocal()}catch(e){data.photos.push(p);renderTask();toast('Не удалено: '+e.message)}
+window.deletePhoto=function(id){
+  if(!confirm('Удалить эту фотографию?'))return;
+  var p=state.data.photos.find(function(x){return x.photoId===id});if(!p)return;
+  state.data.photos=state.data.photos.filter(function(x){return x.photoId!==id});renumberLocal();renderTask();
+  post({action:'deletePhoto',taskId:state.taskId,photoId:id}).then(function(){delete localThumbs[id]}).catch(function(e){state.data.photos.push(p);renumberLocal();renderTask();toast('Не удалось удалить: '+e.message)});
 }
-function renumberLocal(){photos().forEach((p,i)=>p.number=i+1);const t=data.tasks.find(x=>x.taskId===taskId);if(t)t.photoCount=photos().length}
-async function finish(){
-  const id=taskId,t=data.tasks.find(x=>x.taskId===id);if(!confirm('Завершить задание?'))return;
+function renumberLocal(){var ps=taskPhotos();ps.forEach(function(p,i){p.number=i+1});var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(t)t.photoCount=ps.length}
+window.finishTask=function(){
+  var id=state.taskId,t=state.data.tasks.find(function(x){return x.taskId===id});if(!t||!confirm('Завершить задание?'))return;
   t.status='DONE';renderTasks();
-  try{await api({action:'finishTask',taskId:id})}catch(e){t.status='IN_PROGRESS';taskId=id;renderTask();toast('Не завершено: '+e.message)}
+  post({action:'finishTask',taskId:id}).catch(function(e){t.status='IN_PROGRESS';state.taskId=id;renderTask();toast('Не удалось завершить: '+e.message)});
 }
-async function cancelTask(){
-  const id=taskId,t=data.tasks.find(x=>x.taskId===id);if(!confirm('Отказаться? Все загруженные в это задание фото будут удалены.'))return;
-  const oldPhotos=data.photos.filter(p=>p.taskId===id);
-  t.status='OPEN';t.reservedBy='';t.photoCount=0;data.photos=data.photos.filter(p=>p.taskId!==id);renderTasks();
-  try{await api({action:'cancelTask',taskId:id})}catch(e){t.status='IN_PROGRESS';t.reservedBy=telegramUserId;data.photos.push(...oldPhotos);taskId=id;renderTask();toast('Отказ не выполнен: '+e.message)}
+window.cancelTask=function(){
+  var id=state.taskId,t=state.data.tasks.find(function(x){return x.taskId===id});if(!t||!confirm('Отказаться от задания? Загруженные в него фото будут удалены.'))return;
+  var old=state.data.photos.filter(function(p){return p.taskId===id});
+  t.status='OPEN';t.reservedBy='';t.photoCount=0;state.data.photos=state.data.photos.filter(function(p){return p.taskId!==id});renderTasks();
+  post({action:'cancelTask',taskId:id}).catch(function(e){t.status='IN_PROGRESS';t.reservedBy=telegramUserId;state.data.photos=state.data.photos.concat(old);state.taskId=id;renderTask();toast('Отказ не выполнен: '+e.message)});
 }
-function compress(file){return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=e=>{const i=new Image();i.onerror=rej;i.onload=()=>{let w=i.width,h=i.height,M=1280;if(w>M||h>M){const q=Math.min(M/w,M/h);w=Math.round(w*q);h=Math.round(h*q)}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);res(c.toDataURL('image/jpeg',.72))};i.src=e.target.result};r.readAsDataURL(file)})}
 
 /* ================= ADMIN ================= */
-function openAdmin(){
-  if(!adminPassword){loginAdmin();return}
-  renderAdminHome();
+
+window.openAdmin=function(){
+  if(!initData){toast('Админ-панель доступна при открытии через Telegram');return}
+  if(adminSession){adminHome();return}
+  modal('<div class="sheet-head"><div class="sheet-title">Администратор</div><button class="icon" onclick="closeModal()">×</button></div><div class="page-sub">Введите пароль администратора.</div><div class="label">Пароль</div><input id="adminPass" class="field" type="password" autocomplete="current-password"><button class="btn btn-primary" style="margin-top:12px" onclick="adminLogin()">Войти</button>');
 }
-function modal(html){$('overlay').innerHTML=`<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet">${html}</div></div>`}
-function closeModal(){$('overlay').innerHTML=''}
-function loginAdmin(){
-  modal(`<div class="title">Администратор</div><div class="label">Пароль</div><input id="admPass" class="field" type="password" autocomplete="current-password"><button class="action blue" onclick="doAdminLogin()">Войти</button><button class="action" onclick="closeModal()">Отмена</button>`);
+window.adminLogin=function(){
+  var p=el('adminPass').value;if(!p)return;
+  post({action:'adminLogin',adminPassword:p}).then(function(r){
+    adminSession=r.adminSession;sessionStorage.setItem('fr_admin_session',adminSession);adminHome();
+  }).catch(function(e){toast(e.message)});
 }
-async function doAdminLogin(){
-  const p=$('admPass').value;if(!p)return;
-  try{await api({action:'adminLogin',adminPassword:p});adminPassword=p;sessionStorage.setItem('photo_admin_password',p);renderAdminHome()}catch(e){toast(e.message)}
-}
-function renderAdminHome(){
-  modal(`<div class="admin-head"><div class="title">⚙️ Админ-панель</div><button class="icon-btn" onclick="closeModal()">×</button></div><div class="subtitle">Создание мероприятий и технического задания прямо из приложения.</div><button class="action blue" onclick="newEventForm()">＋ Новое мероприятие</button><button class="action red" onclick="adminLogout()">Выйти из админки</button>`);
-}
-function adminLogout(){adminPassword='';sessionStorage.removeItem('photo_admin_password');closeModal();toast('Выход выполнен')}
-let draft=null;
-function newEventForm(){
-  draft={name:'',startDate:'',endDate:'',days:[{name:'День 1',date:'',locations:[]}]};renderEventEditor();
-}
-function renderEventEditor(){
-  let h=`<div class="admin-head"><div class="title">Новое мероприятие</div><button class="icon-btn" onclick="renderAdminHome()">×</button></div>
-  <div class="label">Название</div><input class="field" value="${esc(draft.name)}" oninput="draft.name=this.value">
-  <div class="label">Дата начала</div><input class="field" type="date" value="${esc(draft.startDate)}" oninput="draft.startDate=this.value">
-  <div class="label">Дата окончания</div><input class="field" type="date" value="${esc(draft.endDate)}" oninput="draft.endDate=this.value">`;
-  draft.days.forEach((d,di)=>{
-    h+=`<div class="admin-block"><div class="admin-head"><b>День ${di+1}</b>${draft.days.length>1?`<button class="small danger-text" onclick="draft.days.splice(${di},1);renderEventEditor()">Удалить день</button>`:''}</div>
-    <input class="field" placeholder="Название дня" value="${esc(d.name)}" oninput="draft.days[${di}].name=this.value">
-    <input class="field" type="date" value="${esc(d.date)}" oninput="draft.days[${di}].date=this.value">`;
-    d.locations.forEach((l,li)=>{
-      h+=`<div class="admin-block"><div class="admin-head"><b>Локация ${li+1}</b><button class="small danger-text" onclick="draft.days[${di}].locations.splice(${li},1);renderEventEditor()">×</button></div>
-      <input class="field" placeholder="Например: Регистрация" value="${esc(l.name)}" oninput="draft.days[${di}].locations[${li}].name=this.value">`;
-      l.tasks.forEach((t,ti)=>{
-        h+=`<div class="admin-block"><div class="admin-head"><b>Объект ${ti+1}</b><button class="small danger-text" onclick="draft.days[${di}].locations[${li}].tasks.splice(${ti},1);renderEventEditor()">×</button></div>
-        <input class="field" placeholder="Стол / Принтер / Автобус" value="${esc(t.name)}" oninput="draft.days[${di}].locations[${li}].tasks[${ti}].name=this.value">
-        <div class="row"><input class="field" type="number" min="0" placeholder="Мин. фото" value="${t.minPhotos||''}" oninput="draft.days[${di}].locations[${li}].tasks[${ti}].minPhotos=Number(this.value||0)"><input class="field" type="number" min="0" placeholder="Макс. фото" value="${t.maxPhotos||''}" oninput="draft.days[${di}].locations[${li}].tasks[${ti}].maxPhotos=Number(this.value||0)"></div>
-        <textarea class="field" placeholder="Требование к фото" oninput="draft.days[${di}].locations[${li}].tasks[${ti}].instruction=this.value">${esc(t.instruction)}</textarea></div>`;
-      });
-      h+=`<button class="small" onclick="addTask(${di},${li})">＋ Объект</button></div>`;
+window.adminHome=function(){
+  post({action:'adminListEvents',adminSession:adminSession}).then(function(r){
+    var html='<div class="sheet-head"><div class="sheet-title">Управление</div><button class="icon" onclick="closeModal()">×</button></div>'+
+      '<button class="btn btn-primary" onclick="newEvent()">＋ Новое мероприятие</button>'+
+      '<div class="label">Мероприятия</div>';
+    (r.events||[]).slice().reverse().forEach(function(x){
+      html+='<div class="admin-event"><b>'+esc(x.name)+'</b><div class="meta">'+esc(x.startDate||'')+(x.endDate?' — '+esc(x.endDate):'')+' · '+esc(x.status)+'</div><div class="token">'+esc(x.token)+'</div></div>';
     });
-    h+=`<button class="small" onclick="addLocation(${di})">＋ Локация</button></div>`;
+    html+='<button class="btn btn-danger" style="margin-top:12px" onclick="adminLogout()">Выйти из админки</button>';
+    modal(html);
+  }).catch(function(e){
+    if(String(e.message).indexOf('ADMIN_SESSION')>=0){adminLogout();openAdmin()}else toast(e.message);
   });
-  h+=`<button class="action" onclick="draft.days.push({name:'День '+(draft.days.length+1),date:'',locations:[]});renderEventEditor()">＋ День</button>
-  <button class="action green" onclick="createEvent()">Создать мероприятие</button>`;
-  modal(h);
 }
-function addLocation(di){draft.days[di].locations.push({name:'',tasks:[]});renderEventEditor()}
-function addTask(di,li){draft.days[di].locations[li].tasks.push({name:'',minPhotos:0,maxPhotos:0,instruction:''});renderEventEditor()}
-async function createEvent(){
-  if(!draft.name.trim()){toast('Введите название');return}
-  if(!draft.days.some(d=>d.locations.length)){toast('Добавьте хотя бы одну локацию');return}
-  const btn=[...document.querySelectorAll('.action.green')].pop();if(btn){btn.disabled=true;btn.textContent='Создание…'}
-  try{
-    const r=await api({action:'adminCreateEvent',adminPassword,eventSpec:draft});
-    modal(`<div class="title">✅ Мероприятие создано</div><div class="admin-block"><b>${esc(draft.name)}</b><br><br>EventID: ${esc(r.eventId)}<br>Token: ${esc(r.token)}<br>Дней: ${r.days}<br>Локаций: ${r.locations}<br>Заданий: ${r.tasks}</div><div class="subtitle">Google-таблица и папки Drive созданы автоматически. Сохраните Token — он используется для открытия именно этого мероприятия.</div><button class="action blue" onclick="renderAdminHome()">Готово</button>`);
-  }catch(e){toast('Не создано: '+e.message);if(btn){btn.disabled=false;btn.textContent='Создать мероприятие'}}
+window.adminLogout=function(){adminSession='';sessionStorage.removeItem('fr_admin_session');closeModal();toast('Выход выполнен')}
+
+var draft=null;
+window.newEvent=function(){draft={name:'',startDate:'',endDate:'',days:[{name:'День 1',date:'',locations:[]}]};window.draft=draft;eventEditor()}
+function eventEditor(){
+  window.draft=draft;
+  var html='<div class="sheet-head"><div class="sheet-title">Новое мероприятие</div><button class="icon" onclick="adminHome()">×</button></div>'+
+    '<div class="label">Название</div><input class="field" value="'+esc(draft.name)+'" oninput="draft.name=this.value">'+
+    '<div class="two"><div><div class="label">Начало</div><input class="field" type="date" value="'+esc(draft.startDate)+'" oninput="draft.startDate=this.value"></div><div><div class="label">Окончание</div><input class="field" type="date" value="'+esc(draft.endDate)+'" oninput="draft.endDate=this.value"></div></div>';
+
+  draft.days.forEach(function(d,di){
+    html+='<div class="block"><div class="block-head"><b>День '+(di+1)+'</b>'+(draft.days.length>1?'<button class="mini mini-danger" onclick="removeDay('+di+')">Удалить</button>':'')+'</div>'+
+      '<input class="field" style="margin-top:9px" placeholder="Название дня" value="'+esc(d.name)+'" oninput="draft.days['+di+'].name=this.value">'+
+      '<input class="field" style="margin-top:8px" type="date" value="'+esc(d.date)+'" oninput="draft.days['+di+'].date=this.value">';
+    d.locations.forEach(function(l,li){
+      html+='<div class="block"><div class="block-head"><b>Локация '+(li+1)+'</b><button class="mini mini-danger" onclick="removeLocation('+di+','+li+')">×</button></div>'+
+        '<input class="field" style="margin-top:9px" placeholder="Например: Регистрация" value="'+esc(l.name)+'" oninput="draft.days['+di+'].locations['+li+'].name=this.value">';
+      l.tasks.forEach(function(t,ti){
+        html+='<div class="block"><div class="block-head"><b>Объект '+(ti+1)+'</b><button class="mini mini-danger" onclick="removeObject('+di+','+li+','+ti+')">×</button></div>'+
+          '<input class="field" style="margin-top:9px" placeholder="Стол, принтер, автобус…" value="'+esc(t.name)+'" oninput="draft.days['+di+'].locations['+li+'].tasks['+ti+'].name=this.value">'+
+          '<div class="two"><input class="field" type="number" min="0" placeholder="Мин. фото" value="'+(t.minPhotos||'')+'" oninput="draft.days['+di+'].locations['+li+'].tasks['+ti+'].minPhotos=Number(this.value||0)"><input class="field" type="number" min="0" placeholder="Макс. фото" value="'+(t.maxPhotos||'')+'" oninput="draft.days['+di+'].locations['+li+'].tasks['+ti+'].maxPhotos=Number(this.value||0)"></div>'+
+          '<textarea class="field" placeholder="Что именно нужно сфотографировать" oninput="draft.days['+di+'].locations['+li+'].tasks['+ti+'].instruction=this.value">'+esc(t.instruction)+'</textarea></div>';
+      });
+      html+='<button class="mini" onclick="addObject('+di+','+li+')">＋ Объект</button></div>';
+    });
+    html+='<button class="mini" onclick="addLocation('+di+')">＋ Локация</button></div>';
+  });
+  html+='<button class="btn btn-soft" onclick="addDay()">＋ Добавить день</button><button id="createEventBtn" class="btn btn-ok" style="margin-top:9px" onclick="createEvent()">Создать мероприятие</button>';
+  modal(html);
+}
+window.addDay=function(){draft.days.push({name:'День '+(draft.days.length+1),date:'',locations:[]});eventEditor()}
+window.removeDay=function(i){draft.days.splice(i,1);eventEditor()}
+window.addLocation=function(di){draft.days[di].locations.push({name:'',tasks:[]});eventEditor()}
+window.removeLocation=function(di,li){draft.days[di].locations.splice(li,1);eventEditor()}
+window.addObject=function(di,li){draft.days[di].locations[li].tasks.push({name:'',minPhotos:0,maxPhotos:0,instruction:''});eventEditor()}
+window.removeObject=function(di,li,ti){draft.days[di].locations[li].tasks.splice(ti,1);eventEditor()}
+window.createEvent=function(){
+  if(!draft.name.trim()){toast('Введите название мероприятия');return}
+  var hasTask=false;draft.days.forEach(function(d){d.locations.forEach(function(l){if(l.tasks.length)hasTask=true})});
+  if(!hasTask){toast('Добавьте хотя бы один объект фотоотчёта');return}
+  var b=el('createEventBtn');if(b){b.disabled=true;b.textContent='Создаём…'}
+  post({action:'adminCreateEvent',adminSession:adminSession,eventSpec:draft}).then(function(r){
+    modal('<div class="sheet-head"><div class="sheet-title">Мероприятие создано</div><button class="icon" onclick="closeModal()">×</button></div>'+
+      '<div class="note"><b>'+esc(draft.name)+'</b><br><br>Дней: '+r.days+'<br>Локаций: '+r.locations+'<br>Объектов: '+r.tasks+'</div>'+
+      '<div class="label">Token мероприятия</div><div class="block token">'+esc(r.token)+'</div>'+
+      '<div class="page-sub">Таблица Google Sheets и структура папок Google Drive созданы автоматически.</div>'+
+      '<button class="btn btn-primary" onclick="adminHome()">Готово</button>');
+  }).catch(function(e){toast('Не удалось создать: '+e.message);if(b){b.disabled=false;b.textContent='Создать мероприятие'}});
 }
 
+window.addEventListener('error',function(e){
+  if(!state.data){el('app').innerHTML='<div class="error"><b>Ошибка запуска</b><br><br>'+esc(e.message||'JavaScript error')+'</div>'}
+});
+window.addEventListener('unhandledrejection',function(e){
+  if(!state.data){var msg=e.reason&&e.reason.message?e.reason.message:String(e.reason||'Ошибка');el('app').innerHTML='<div class="error"><b>Ошибка запуска</b><br><br>'+esc(msg)+'</div>'}
+});
+
 start();
+})();
 </script>
 </body>
 </html>
