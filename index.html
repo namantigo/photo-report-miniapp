@@ -1,22 +1,713 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
 <title>Фотоотчет</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-html,body{margin:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-main{padding:32px 20px;text-align:center;color:#6b7280}
+:root{
+  --bg:var(--tg-theme-bg-color,#f5f7fb);
+  --card:var(--tg-theme-secondary-bg-color,#ffffff);
+  --text:var(--tg-theme-text-color,#111827);
+  --muted:var(--tg-theme-hint-color,#6b7280);
+  --primary:var(--tg-theme-button-color,#2563eb);
+  --on-primary:var(--tg-theme-button-text-color,#ffffff);
+  --line:rgba(127,127,127,.16);
+  --ok:#16a34a;--warn:#d97706;--danger:#dc2626;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+#app{max-width:760px;margin:auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+.shell{animation:fade .18s ease}@keyframes fade{from{opacity:.4}to{opacity:1}}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.brand-left{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#0b1220,#2563eb);display:grid;place-items:center;color:white;font-size:21px;box-shadow:0 8px 24px rgba(37,99,235,.18)}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:-.3px}.brand-sub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-actions{display:flex;align-items:center;gap:7px}.quick-my{height:42px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);padding:0 11px;font-size:12px;font-weight:750}.icon{width:42px;height:42px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);display:grid;place-items:center;font-size:19px}
+.page-title{font-size:28px;line-height:1.08;font-weight:820;letter-spacing:-.7px;margin:0 0 6px}.top-actions{display:flex;gap:8px;margin:14px 0 18px}.mytasks{width:auto;padding:10px 13px;border-radius:12px;font-size:14px}.mytasks-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--primary);color:var(--on-primary);font-size:11px}.page-sub{color:var(--muted);font-size:14px;line-height:1.45;margin-bottom:18px}
+.back{border:0;background:transparent;color:var(--primary);padding:2px 0 14px;font-weight:650}
+.card{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:18px;padding:16px;margin:0 0 10px;text-align:left;box-shadow:0 3px 16px rgba(15,23,42,.035)}
+.card-row{display:flex;align-items:center;gap:13px;min-width:0}.badge{width:46px;min-width:46px;max-width:46px;height:46px;padding:0;border-radius:14px;background:rgba(37,99,235,.1);color:var(--primary);font-weight:800;display:grid;place-items:center;overflow:hidden;white-space:nowrap}.grow{min-width:0;flex:1}
+.grow{flex:1;min-width:0}.card-title{font-size:17px;font-weight:730;line-height:1.25}.meta{font-size:13px;color:var(--muted);margin-top:5px}.mine{color:var(--ok);font-weight:650}.busy{color:var(--warn);font-weight:650}.chev{font-size:24px;color:var(--muted);opacity:.55}
+.task-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}.task-name{font-size:27px;font-weight:820;letter-spacing:-.5px;line-height:1.08}
+.note{border:1px solid var(--line);background:var(--card);padding:14px;border-radius:15px;line-height:1.45;margin:12px 0 16px}.counter{display:flex;align-items:center;justify-content:space-between;margin:16px 1px 10px}.counter strong{font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.photo{position:relative;aspect-ratio:1;border-radius:15px;overflow:hidden;background:#e5e7eb;border:1px solid var(--line)}.photo img{width:100%;height:100%;object-fit:cover;display:block}.photo-file{height:100%;display:grid;place-items:center;text-align:center;padding:10px;color:#4b5563;font-size:11px;word-break:break-word}
+.close-photo{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(15,23,42,.82);color:white;font-size:21px;line-height:28px;padding:0}
+.upload-mask{position:absolute;inset:0;background:rgba(255,255,255,.42);display:grid;place-items:center}.ring{width:31px;height:31px;border:3px solid rgba(15,23,42,.16);border-top-color:#0f172a;border-radius:50%;animation:spin .65s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.actions{display:grid;gap:9px}.btn{width:100%;border:0;border-radius:15px;padding:15px 16px;font-weight:750;font-size:16px}.btn-primary{background:var(--primary);color:var(--on-primary)}.btn-ok{background:var(--ok);color:white}.btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(220,38,38,.4)}.btn-soft{background:var(--card);color:var(--text);border:1px solid var(--line)}.btn:disabled{opacity:.42;cursor:default}
+.toast{position:fixed;z-index:300;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0f172a;color:white;padding:11px 14px;border-radius:12px;font-size:13px;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal{position:fixed;z-index:200;inset:0;background:rgba(2,6,23,.48);display:flex;align-items:flex-end}.sheet{width:100%;max-height:94vh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(0,0,0,.18)}
+.sheet-bar{width:42px;height:5px;border-radius:9px;background:rgba(127,127,127,.35);margin:0 auto 16px}.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.sheet-title{font-size:23px;font-weight:820;letter-spacing:-.4px}
+.label{font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 5px}.field{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:13px;padding:13px 14px;outline:none}.field:focus{border-color:var(--primary)}textarea.field{min-height:80px;resize:vertical}
+.block{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:13px;margin:10px 0}.block-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.mini{border:0;border-radius:10px;padding:9px 11px;background:rgba(127,127,127,.1);color:var(--text);font-size:13px;font-weight:650}.mini-danger{color:var(--danger)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.empty{text-align:center;color:var(--muted);padding:28px 10px}.error{margin:20px auto;max-width:680px;background:#fee2e2;color:#991b1b;padding:16px;border-radius:15px;line-height:1.45}
+.skeleton{height:76px;border-radius:18px;margin:10px 0;background:linear-gradient(90deg,rgba(127,127,127,.08),rgba(127,127,127,.16),rgba(127,127,127,.08));background-size:200% 100%;animation:sh 1.1s infinite}@keyframes sh{to{background-position:-200% 0}}
+.admin-event{padding:13px;border-radius:14px;background:var(--card);border:1px solid var(--line);margin:8px 0}.admin-event b{display:block}.status-pill{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-top:7px;background:rgba(127,127,127,.12)}.status-pill.hidden{opacity:.65}.event-date{font-size:13px;color:var(--muted);margin-top:4px}.danger-zone{margin-top:42px;padding-top:18px;border-top:1px solid var(--line)}.admin-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.linkbox{font-size:12px;word-break:break-all;padding:10px;border-radius:10px;background:rgba(127,127,127,.08);margin-top:8px}.token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);word-break:break-all;margin-top:5px}
 </style>
 </head>
 <body>
-<main>Открываем фотоотчёт…</main>
+<div id="app">
+  <div class="shell">
+    <div class="brand"><div class="brand-left"><div class="logo">F</div><div><div class="brand-name">Фотоотчет</div><div class="brand-sub">Рабочий фотоотчёт</div></div></div></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</div>
+<input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+<input id="galleryInput" type="file" accept="image/*" multiple hidden>
+<div id="overlay"></div>
+
 <script>
 (function(){
-  var target='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
-  // Preserve Telegram's tgWebAppData/start parameters during the navigation.
-  var suffix=(window.location.search||'')+(window.location.hash||'');
-  window.location.replace(target+suffix);
+'use strict';
+
+var API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZP6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
+var tg=window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if(tg){tg.ready();tg.expand()}
+
+var initData=tg && tg.initData ? tg.initData : '';
+var telegramUserId=(tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) ? String(tg.initDataUnsafe.user.id) : '';
+var query='';
+try{query=window.location && window.location.search ? window.location.search : ''}catch(e){}
+var eventKey='';
+try{
+  var m=query.match(/[?&]event=([^&]+)/);
+  if(m) eventKey=decodeURIComponent(m[1]);
+}catch(e){}
+if(!eventKey && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) eventKey=String(tg.initDataUnsafe.start_param);
+
+var state={data:null,dayId:null,locationId:null,taskId:null,uploading:false,fromMyTasks:false};
+var localThumbs={};
+var photoLoaded={};
+var openedFromEventList=false;
+var adminSession=sessionStorage.getItem('fr_admin_session')||'';
+var myTasksCache=null;
+var ACTIVE_EVENTS_CACHE='fr_active_events_v9';
+
+function el(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function js(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+function fmtDate(s){
+  s=String(s||'').slice(0,10);
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m?m[3]+'.'+m[2]+'.'+m[1]:s;
+}
+function dateRange(a,b){
+  a=fmtDate(a);b=fmtDate(b);
+  if(a&&b&&a!==b)return a+' — '+b;
+  return a||b||'';
+}
+function safeTaskNumber(n,fallback){
+  n=String(n==null?'':n).trim();
+  return /^\d+(?:\.\d+)*$/.test(n)?n:String(fallback||'');
+}
+function toast(s){var d=document.createElement('div');d.className='toast';d.textContent=s;document.body.appendChild(d);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},1900)}
+function modal(html){el('overlay').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheet-bar"></div>'+html+'</div></div>'}
+window.closeModal=function(){el('overlay').innerHTML=''}
+
+var bridgeFrame=null,bridgeWindow=null,bridgeNonce='',bridgeReady=null,bridgePending={},bridgeSeq=0;
+window.addEventListener('message',function(e){
+  if(!bridgeFrame||!e.data||e.data.nonce!==bridgeNonce)return;
+  if(e.data.type==='fr-bridge-ready'){
+    bridgeWindow=e.source;
+    if(bridgeReady)bridgeReady.resolve();
+  }else if(e.data.type==='fr-bridge-response'){
+    if(e.source!==bridgeWindow)return;
+    var pending=bridgePending[e.data.id];
+    if(!pending)return;
+    delete bridgePending[e.data.id];clearTimeout(pending.timer);
+    if(e.data.error)pending.reject(new Error(e.data.error));
+    else pending.resolve(e.data.result);
+  }
+});
+function ensureBridge(){
+  if(bridgeReady)return bridgeReady.promise;
+  var bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);
+  bridgeNonce=Array.prototype.map.call(bytes,function(b){return ('0'+b.toString(16)).slice(-2)}).join('');
+  bridgeReady={};
+  bridgeReady.promise=new Promise(function(resolve,reject){
+    var timer=setTimeout(function(){reject(new Error('Не удалось подключиться к Apps Script. Проверьте адрес и доступ к Web App'))},15000);
+    bridgeReady.resolve=function(){clearTimeout(timer);resolve()};
+  });
+  bridgeFrame=document.createElement('iframe');
+  bridgeFrame.style.display='none';
+  bridgeFrame.setAttribute('title','Соединение с сервером');
+  bridgeFrame.src=API_URL+'?action=bridge&nonce='+bridgeNonce;
+  document.body.appendChild(bridgeFrame);
+  return bridgeReady.promise;
+}
+function request(method,url,body){
+  return ensureBridge().then(function(){
+    return new Promise(function(resolve,reject){
+      var id=++bridgeSeq;
+      var timer=setTimeout(function(){delete bridgePending[id];reject(new Error('Сервер отвечает слишком долго'))},25000);
+      bridgePending[id]={resolve:resolve,reject:reject,timer:timer};
+      bridgeWindow.postMessage({type:'fr-bridge-request',nonce:bridgeNonce,id:id,method:method,url:url,body:body},'*');
+    });
+  });
+}
+function getPublicEvents(){
+  var url=API_URL+'?action=events&t='+Date.now();
+  return request('GET',url,null).then(function(r){
+    if(!r.ok)throw new Error(r.code||r.error||'Ошибка загрузки мероприятий');
+    return r.events||[];
+  });
+}
+function getData(){
+  var url=API_URL+'?action=data&t='+Date.now();
+  if(eventKey)url+='&event='+encodeURIComponent(eventKey);
+  return request('GET',url,null).then(function(r){
+    if(!r.ok)throw new Error(r.code||r.error||'Ошибка загрузки');
+    return r.data;
+  });
+}
+function post(body){
+  var payload={};
+  Object.keys(body||{}).forEach(function(k){payload[k]=body[k]});
+  payload.initData=initData;
+  payload.event=eventKey;
+  return request('POST',API_URL,payload).then(function(r){
+    if(!r.ok)throw new Error(r.code||r.error||'Ошибка');
+    return r;
+  });
+}
+
+function brand(sub){
+  return '<div class="brand"><div class="brand-left"><div class="logo">F</div><div><div class="brand-name">Фотоотчет</div><div class="brand-sub">'+esc(sub||state.data.event.name)+'</div></div></div><div class="brand-actions"><button class="quick-my" onclick="openMyTasks()">Мои задачи</button><button class="icon" onclick="openAdmin()">⚙</button></div></div>';
+}
+function back(fn,label){return '<button class="back" onclick="'+fn+'">‹ '+esc(label||'Назад')+'</button>'}
+
+function start(){
+  if(eventKey){
+    openedFromEventList=false;
+    loadEvent(eventKey);
+  }else{
+    renderEventChooser();
+  }
+}
+function loadEvent(key){
+  eventKey=String(key||'');
+  getData().then(function(d){
+    state.data=d;state.dayId=null;state.locationId=null;state.taskId=null;
+    photoLoaded={};localThumbs={};
+    renderDays();
+  }).catch(function(e){
+    el('app').innerHTML='<div class="error"><b>Не удалось открыть фотоотчёт</b><br><br>'+esc(e.message)+'<br><br><button class="btn btn-soft" onclick="renderEventChooser()">К мероприятиям</button></div>';
+  });
+}
+function renderEventCards(events){
+  var html='';
+  events=(events||[]).slice().sort(function(a,b){return String(a.startDate||'').localeCompare(String(b.startDate||''))});
+  if(!events.length)html='<div class="empty">Нет активных мероприятий.</div>';
+  events.forEach(function(x){
+    html+='<button class="card" onclick="openEventFromList(\''+js(x.token)+'\')"><div class="card-row"><div class="grow"><div class="card-title">'+esc(x.name)+'</div><div class="meta">'+esc(dateRange(x.startDate,x.endDate))+'</div></div><div class="chev">›</div></div></button>';
+  });
+  var target=el('eventList');if(target)target.innerHTML=html;
+}
+window.renderEventChooser=function(){
+  eventKey='';
+  state.data=null;state.dayId=null;state.locationId=null;state.taskId=null;state.fromMyTasks=false;
+  el('app').innerHTML='<div class="shell">'+
+    '<div class="brand"><div class="brand-left"><div class="logo">F</div><div><div class="brand-name">Фотоотчет</div><div class="brand-sub">Мероприятия</div></div></div><button class="icon" onclick="openAdmin()">⚙</button></div>'+
+    '<h1 class="page-title">Мероприятия</h1>'+
+    '<div class="top-actions"><button class="btn btn-soft mytasks" onclick="openMyTasks()">Мои задачи<span id="myTasksBadge"></span></button></div>'+
+    '<div id="eventList"><div class="skeleton"></div><div class="skeleton"></div></div></div>';
+
+  // Show the last successful list immediately, then refresh silently.
+  try{
+    var cached=JSON.parse(localStorage.getItem(ACTIVE_EVENTS_CACHE)||'null');
+    if(cached&&Array.isArray(cached.events))renderEventCards(cached.events);
+  }catch(e){}
+
+  getPublicEvents().then(function(events){
+    renderEventCards(events);
+    try{localStorage.setItem(ACTIVE_EVENTS_CACHE,JSON.stringify({events:events,ts:Date.now()}))}catch(e){}
+  }).catch(function(e){
+    var target=el('eventList');
+    if(target&&!target.querySelector('.card'))target.innerHTML='<div class="error">'+esc(e.message)+'</div>';
+  });
+}
+
+window.openEventFromList=function(token){openedFromEventList=true;state.fromMyTasks=false;loadEvent(token)}
+
+window.renderDays=function(){
+  state.dayId=null;state.locationId=null;state.taskId=null;
+  var d=state.data;
+  var html='<div class="shell">'+brand(d.event.name)+(openedFromEventList?back('renderEventChooser()','К мероприятиям'):'')+'<h1 class="page-title">'+esc(d.event.name)+'</h1><div class="page-sub">'+esc(dateRange(d.event.startDate,d.event.endDate))+'</div>';
+  var days=(d.days||[]).slice().sort(function(a,b){return Number(a.order)-Number(b.order)});
+  days.forEach(function(day){
+    var ts=d.tasks.filter(function(t){return t.dayId===day.dayId});
+    var done=ts.filter(function(t){return t.status==='DONE'}).length;
+    html+='<button class="card" onclick="openDay(\''+js(day.dayId)+'\')"><div class="card-row"><div class="badge">'+esc(day.day||day.order)+'</div><div class="grow"><div class="card-title">'+esc(day.name||('День '+day.day))+'</div><div class="meta">'+esc(fmtDate(day.date||''))+(day.date?' · ':'')+'Выполнено '+done+' из '+ts.length+'</div></div><div class="chev">›</div></div></button>';
+  });
+  html+='</div>';el('app').innerHTML=html;
+}
+window.openDay=function(id){state.dayId=id;renderLocations()}
+window.renderLocations=function(){
+  state.locationId=null;state.taskId=null;
+  var d=state.data,day=d.days.find(function(x){return x.dayId===state.dayId});
+  var html='<div class="shell">'+brand(d.event.name)+back('renderDays()','К дням')+'<h1 class="page-title">'+esc(day?day.name:'День')+'</h1><div class="page-sub">Выберите зону или направление</div>';
+  var locs=d.locations.filter(function(x){return x.dayId===state.dayId}).sort(function(a,b){return Number(a.order)-Number(b.order)});
+  locs.forEach(function(l){
+    var ts=d.tasks.filter(function(t){return t.locationId===l.locationId});
+    var left=ts.filter(function(t){return t.status!=='DONE'}).length;
+    html+='<button class="card" onclick="openLocation(\''+js(l.locationId)+'\')"><div class="card-row"><div class="badge">'+esc(l.number)+'</div><div class="grow"><div class="card-title">'+esc(l.name)+'</div><div class="meta">Осталось '+left+' из '+ts.length+'</div></div><div class="chev">›</div></div></button>';
+  });
+  if(!locs.length)html+='<div class="empty">Для этого дня пока нет локаций.</div>';
+  html+='</div>';el('app').innerHTML=html;
+}
+window.openLocation=function(id){state.locationId=id;renderTasks()}
+window.renderTasks=function(){
+  state.taskId=null;state.fromMyTasks=false;
+  var d=state.data,l=d.locations.find(function(x){return x.locationId===state.locationId});
+  var html='<div class="shell">'+brand(d.event.name)+back('renderLocations()','К локациям')+'<h1 class="page-title">'+esc(l?l.name:'Задания')+'</h1><div class="page-sub">Выберите объект фотоотчёта</div>';
+  var ts=d.tasks.filter(function(t){return t.locationId===state.locationId&&t.status!=='DONE'}).sort(function(a,b){return String(a.taskId).localeCompare(String(b.taskId),undefined,{numeric:true})});
+  if(!ts.length)html+='<div class="empty">✓ Все задания выполнены</div>';
+  ts.forEach(function(t){
+    var st='';
+    if(t.status==='IN_PROGRESS'){
+      st=String(t.reservedBy)===telegramUserId?'<div class="meta mine">● Ваше задание</div>':'<div class="meta busy">● Выполняется другим участником</div>';
+    }
+    html+='<button class="card" onclick="openTask(\''+js(t.taskId)+'\')"><div class="card-row"><div class="grow"><div class="card-title">'+esc(t.name)+'</div>'+st+'</div><div class="chev">›</div></div></button>';
+  });
+  html+='</div>';el('app').innerHTML=html;
+}
+
+window.openTask=function(id){
+  var t=state.data.tasks.find(function(x){return x.taskId===id});if(!t)return;
+  if(t.status==='IN_PROGRESS'&&String(t.reservedBy)!==telegramUserId){toast('Задание уже выполняет другой участник');return}
+  state.taskId=id;
+  if(t.status==='OPEN'){
+    t.status='IN_PROGRESS';t.reservedBy=telegramUserId;t.photoCount=0;photoLoaded[id]=true;renderTask();
+    post({action:'reserve',taskId:id}).then(function(){myTasksCache=null}).catch(function(e){t.status='OPEN';t.reservedBy='';renderTasks();toast('Не удалось взять задание: '+e.message)});
+  }else{
+    renderTask();
+    if(Number(t.photoCount||0)>0&&!photoLoaded[id])loadTaskPhotos(id);
+  }
+}
+function loadTaskPhotos(id){
+  post({action:'getTaskPhotos',taskId:id}).then(function(r){
+    state.data.photos=state.data.photos.filter(function(p){return p.taskId!==id});
+    (r.photos||[]).forEach(function(p){state.data.photos.push(p)});
+    photoLoaded[id]=true;
+    var t=state.data.tasks.find(function(x){return x.taskId===id});
+    if(t)t.photoCount=Number(r.photoCount||0);
+    if(state.taskId===id)renderTask();
+  }).catch(function(e){toast('Миниатюры не загружены: '+e.message)});
+}
+
+function taskPhotos(){
+  return state.data.photos.filter(function(p){return p.taskId===state.taskId}).sort(function(a,b){return Number(a.number)-Number(b.number)});
+}
+window.renderTask=function(){
+  var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(!t){renderTasks();return}
+  var ps=taskPhotos(),count=photoLoaded[t.taskId]?ps.length:Number(t.photoCount||ps.length||0),required=t.minPhotos>0?t.minPhotos:1,maxed=t.maxPhotos>0&&count>=t.maxPhotos;
+  var backFn=state.fromMyTasks?'openMyTasks()':'renderTasks()';
+  var backLabel=state.fromMyTasks?'К моим задачам':'К заданиям';
+  var html='<div class="shell">'+brand(state.data.event.name)+back(backFn,backLabel)+
+    '<div class="task-head"><div class="task-name">'+esc(t.name)+'</div></div>'+
+    '<div class="page-sub">Минимум '+required+' фото'+(t.maxPhotos>0?' · максимум '+t.maxPhotos:'')+'</div>';
+  if(t.instruction)html+='<div class="note"><b>Требование</b><br>'+esc(t.instruction)+'</div>';
+  html+='<div class="counter"><span>Фотографии</span><strong>'+count+'</strong></div><div class="grid">';
+  ps.forEach(function(p){
+    var src=localThumbs[p.photoId]||p.thumbnailBase64||'';
+    var visual=src?'<img src="'+esc(src)+'" alt="">':'<div class="photo-file">📷<br>'+esc(p.fileName)+'</div>';
+    html+='<div class="photo">'+visual+'<button class="close-photo" onclick="deletePhoto(\''+js(p.photoId)+'\')">×</button>'+(p.uploading?'<div class="upload-mask"><div class="ring"></div></div>':'')+'</div>';
+  });
+  if(!photoLoaded[t.taskId]&&count>ps.length){
+    for(var pi=ps.length;pi<count;pi++){
+      html+='<div class="photo"><div class="photo-file">📷</div><div class="upload-mask"><div class="ring"></div></div></div>';
+    }
+  }
+  html+='</div><div class="actions">'+
+    '<button class="btn btn-primary" onclick="camera()" '+(state.uploading||maxed?'disabled':'')+'>📷 Сделать фото</button>'+
+    '<button class="btn btn-soft" onclick="gallery()" '+(state.uploading||maxed?'disabled':'')+'>Выбрать из галереи</button>'+
+    '<button class="btn btn-ok" onclick="finishTask()" '+(state.uploading||count<required?'disabled':'')+'>Завершить задание</button>'+
+    '</div><div class="danger-zone"><button class="btn btn-danger" onclick="cancelTask()" '+(state.uploading?'disabled':'')+'>Отказаться от задания</button></div></div>';
+  el('app').innerHTML=html;
+}
+window.camera=function(){if(!state.uploading)el('cameraInput').click()}
+window.gallery=function(){if(!state.uploading)el('galleryInput').click()}
+
+el('cameraInput').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(f)uploadFiles([f]);e.target.value=''});
+el('galleryInput').addEventListener('change',function(e){var a=Array.prototype.slice.call(e.target.files||[]);if(a.length)uploadFiles(a);e.target.value=''});
+
+function prepareImage(file){
+  return new Promise(function(resolve,reject){
+    var r=new FileReader();
+    r.onerror=reject;
+    r.onload=function(ev){
+      var img=new Image();
+      img.onerror=reject;
+      img.onload=function(){
+        function draw(max,quality){
+          var w=img.width,h=img.height;
+          if(w>max||h>max){var q=Math.min(max/w,max/h);w=Math.round(w*q);h=Math.round(h*q)}
+          var c=document.createElement('canvas');c.width=w;c.height=h;
+          c.getContext('2d').drawImage(img,0,0,w,h);
+          return c.toDataURL('image/jpeg',quality);
+        }
+        // One decode of the original image creates both the report image and thumbnail.
+        resolve({full:draw(1080,.68),thumb:draw(140,.42)});
+      };
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+async function sendPreparedBatch(batch,t,taskId){
+  if(!batch.length)return;
+  var r=await post({
+    action:'uploadPhotos',
+    taskId:taskId,
+    photos:batch.map(function(x){return {imageBase64:x.full,thumbnailBase64:x.thumb}})
+  });
+
+  batch.forEach(function(x){
+    state.data.photos=state.data.photos.filter(function(p){return p.photoId!==x.tempId});
+    delete localThumbs[x.tempId];
+  });
+
+  (r.photos||[]).forEach(function(p,idx){
+    p.uploading=false;
+    state.data.photos.push(p);
+    if(batch[idx])localThumbs[p.photoId]=batch[idx].thumb;
+  });
+  t.photoCount=Number(r.photoCount||taskPhotos().length);
+  photoLoaded[taskId]=true;
+  if(state.taskId===taskId)renderTask();
+}
+async function uploadFiles(files){
+  var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(!t)return;
+  var existing=Number(t.photoCount||taskPhotos().length||0);
+  if(t.maxPhotos>0)files=files.slice(0,Math.max(0,t.maxPhotos-existing));
+  if(!files.length)return;
+
+  state.uploading=true;
+  var originalTaskId=state.taskId;
+  photoLoaded[originalTaskId]=true;
+
+  try{
+    // Three originals are prepared in parallel. This is much faster on iPhone,
+    // while keeping memory usage safe. It is NOT a photo-count limit.
+    for(var offset=0;offset<files.length;offset+=3){
+      if(state.taskId!==originalTaskId)break;
+      var chunk=files.slice(offset,offset+3);
+      var preparedList=await Promise.all(chunk.map(function(file){return prepareImage(file)}));
+      var batch=[];
+
+      preparedList.forEach(function(prepared,i){
+        var tempId='TMP_'+Date.now()+'_'+offset+'_'+i;
+        state.data.photos.push({
+          photoId:tempId,taskId:originalTaskId,
+          number:taskPhotos().length+1,fileName:'',
+          thumbnailBase64:prepared.thumb,uploading:true
+        });
+        localThumbs[tempId]=prepared.thumb;
+        batch.push({tempId:tempId,full:prepared.full,thumb:prepared.thumb});
+      });
+
+      t.photoCount=taskPhotos().length;
+      renderTask();
+
+      try{
+        await sendPreparedBatch(batch,t,originalTaskId);
+      }catch(batchErr){
+        batch.forEach(function(x){
+          state.data.photos=state.data.photos.filter(function(p){return p.photoId!==x.tempId});
+          delete localThumbs[x.tempId];
+        });
+        t.photoCount=taskPhotos().length;
+        renderTask();
+        toast('Часть фото не загружена: '+batchErr.message);
+      }
+    }
+  }catch(e){
+    toast('Ошибка подготовки фото: '+e.message);
+  }
+
+  state.uploading=false;
+  t.photoCount=taskPhotos().length;
+  myTasksCache=null;
+  if(state.taskId===originalTaskId)renderTask();
+}
+
+window.deletePhoto=function(id){
+  if(!confirm('Удалить эту фотографию?'))return;
+  var p=state.data.photos.find(function(x){return x.photoId===id});if(!p)return;
+  state.data.photos=state.data.photos.filter(function(x){return x.photoId!==id});renumberLocal();renderTask();
+  post({action:'deletePhoto',taskId:state.taskId,photoId:id}).then(function(){delete localThumbs[id]}).catch(function(e){state.data.photos.push(p);renumberLocal();renderTask();toast('Не удалось удалить: '+e.message)});
+}
+function renumberLocal(){var ps=taskPhotos();ps.forEach(function(p,i){p.number=i+1});var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(t)t.photoCount=ps.length}
+window.finishTask=function(){
+  var id=state.taskId,t=state.data.tasks.find(function(x){return x.taskId===id});if(!t||!confirm('Завершить задание?'))return;
+  var fromMine=state.fromMyTasks;
+  post({action:'finishTask',taskId:id}).then(function(){
+    t.status='DONE';t.reservedBy='';myTasksCache=null;
+    if(fromMine)openMyTasks();else renderTasks();
+  }).catch(function(e){toast('Не удалось завершить: '+e.message)});
+}
+
+window.cancelTask=function(){
+  var id=state.taskId,t=state.data.tasks.find(function(x){return x.taskId===id});if(!t||!confirm('Отказаться от задания? Загруженные в него фото будут удалены.'))return;
+  var fromMine=state.fromMyTasks;
+  post({action:'cancelTask',taskId:id}).then(function(){
+    t.status='OPEN';t.reservedBy='';t.photoCount=0;
+    state.data.photos=state.data.photos.filter(function(p){return p.taskId!==id});
+    myTasksCache=null;
+    if(fromMine)openMyTasks();else renderTasks();
+  }).catch(function(e){toast('Отказ не выполнен: '+e.message)});
+}
+
+
+/* ================= MY TASKS ================= */
+
+window.openMyTasks=function(){
+  state.fromMyTasks=false;
+  var cached=myTasksCache;
+  el('app').innerHTML='<div class="shell">'+
+    '<div class="brand"><div class="brand-left"><div class="logo">F</div><div><div class="brand-name">Фотоотчет</div><div class="brand-sub">Мои задачи</div></div></div><button class="icon" onclick="openAdmin()">⚙</button></div>'+
+    back('renderEventChooser()','К мероприятиям')+
+    '<h1 class="page-title">Мои задачи</h1><div id="myTasksList">'+
+    (cached?renderMyTasksHtml(cached.tasks||[]):'<div class="skeleton"></div><div class="skeleton"></div>')+
+    '</div></div>';
+
+  post({action:'myTasks'}).then(function(r){
+    myTasksCache=r;
+    var target=el('myTasksList');if(target)target.innerHTML=renderMyTasksHtml(r.tasks||[]);
+  }).catch(function(e){
+    var target=el('myTasksList');
+    if(target&&!cached)target.innerHTML='<div class="error">'+esc(e.message)+'</div>';
+  });
+}
+function renderMyTasksHtml(tasks){
+  if(!tasks.length)return '<div class="empty">Активных задач нет.</div>';
+  var html='';
+  tasks.forEach(function(t){
+    var place=[t.dayName,t.locationName].filter(Boolean).join(' · ');
+    var req=t.minPhotos>0?t.minPhotos:1;
+    html+='<button class="card" onclick="openMyTask(\''+js(t.eventToken)+'\',\''+js(t.dayId)+'\',\''+js(t.locationId)+'\',\''+js(t.taskId)+'\')">'+
+      '<div class="card-row"><div class="grow"><div class="meta" style="margin-top:0">'+esc(t.eventName)+'</div>'+
+      '<div class="card-title" style="margin-top:4px">'+esc(t.taskName)+'</div>'+
+      (place?'<div class="meta">'+esc(place)+'</div>':'')+
+      '<div class="meta mine">'+Number(t.photoCount||0)+' / '+req+' фото</div></div><div class="chev">›</div></div></button>';
+  });
+  return html;
+}
+window.openMyTask=function(token,dayId,locationId,taskId){
+  eventKey=String(token||'');
+  openedFromEventList=true;
+  getData().then(function(d){
+    state.data=d;state.dayId=dayId;state.locationId=locationId;state.taskId=taskId;state.fromMyTasks=true;
+    photoLoaded={};localThumbs={};
+    var t=d.tasks.find(function(x){return x.taskId===taskId});
+    if(!t||t.status!=='IN_PROGRESS'||String(t.reservedBy)!==telegramUserId){
+      myTasksCache=null;toast('Эта задача уже не активна');openMyTasks();return;
+    }
+    renderTask();
+    if(Number(t.photoCount||0)>0)loadTaskPhotos(taskId);
+  }).catch(function(e){toast('Не удалось открыть задачу: '+e.message);openMyTasks()});
+}
+
+/* ================= ADMIN ================= */
+
+window.openAdmin=function(){
+  if(!initData){toast('Админ-панель доступна при открытии через Telegram');return}
+  if(adminSession){adminHome();return}
+  modal('<div class="sheet-head"><div class="sheet-title">Администратор</div><button class="icon" onclick="closeModal()">×</button></div><div class="page-sub">Введите пароль администратора.</div><div class="label">Пароль</div><input id="adminPass" class="field" type="password" autocomplete="current-password"><button class="btn btn-primary" style="margin-top:12px" onclick="adminLogin()">Войти</button>');
+}
+window.adminLogin=function(){
+  var p=el('adminPass').value;if(!p)return;
+  post({action:'adminLogin',adminPassword:p}).then(function(r){
+    adminSession=r.adminSession;sessionStorage.setItem('fr_admin_session',adminSession);adminHome();
+  }).catch(function(e){toast(e.message)});
+}
+window.adminLogout=function(){
+  adminSession='';
+  try{sessionStorage.removeItem('fr_admin_session')}catch(e){}
+  closeModal();
+  toast('Вы вышли из админки');
+  if(!state.data)renderEventChooser();
+}
+window.adminHome=function(){
+  post({action:'adminListEvents',adminSession:adminSession}).then(function(r){
+    var html='<div class="sheet-head"><div class="sheet-title">Админ-панель</div><button class="icon" onclick="closeModal()">×</button></div>'+
+      '<button class="btn btn-primary" onclick="newEvent()">＋ Новое мероприятие</button>'+
+      '<div class="label">Мероприятия</div>';
+
+    (r.events||[]).slice().reverse().forEach(function(x){
+      var hidden=String(x.status).toUpperCase()==='HIDDEN';
+      html+='<div class="admin-event"><b>'+esc(x.name)+'</b>'+
+        '<div class="event-date">'+esc(dateRange(x.startDate,x.endDate))+'</div>'+
+        '<div class="status-pill '+(hidden?'hidden':'')+'">'+(hidden?'Скрыто':'Активно')+'</div>'+
+        '<div class="admin-actions">'+
+          '<button class="mini" onclick="openAdminEvent(\''+js(x.token)+'\')">Открыть</button>'+
+          '<button class="mini" onclick="editEvent(\''+js(x.eventId)+'\')">✎ Редактировать</button>'+
+          '<button class="mini" onclick="setEventStatus(\''+js(x.eventId)+'\',\''+(hidden?'ACTIVE':'HIDDEN')+'\')">'+(hidden?'Показать':'Скрыть')+'</button>'+
+          (x.driveUrl?'<button class="mini" onclick="openExternal(\''+js(x.driveUrl)+'\')">Drive</button>':'')+
+          (x.spreadsheetUrl?'<button class="mini" onclick="openExternal(\''+js(x.spreadsheetUrl)+'\')">Таблица</button>':'')+
+          (x.workerUrl?'<button class="mini" onclick="copyText(\''+js(x.workerUrl)+'\')">Ссылка сотрудникам</button>':'')+
+          '<button class="mini" onclick="createReportLink(\''+js(x.eventId)+'\')">Ссылка на ZIP</button>'+
+        '</div></div>';
+    });
+
+    html+='<button class="btn btn-danger" style="margin-top:18px" onclick="adminLogout()">Выйти из админки</button>';
+    modal(html);
+  }).catch(function(e){
+    if(String(e.message).indexOf('ADMIN_SESSION')>=0){adminLogout();openAdmin()}else toast(e.message);
+  });
+}
+window.openExternal=function(url){
+  if(tg&&tg.openLink){tg.openLink(url)}else window.open(url,'_blank');
+}
+window.openAdminEvent=function(token){
+  closeModal();openedFromEventList=true;loadEvent(token);
+}
+window.setEventStatus=function(eventId,status){
+  post({action:'adminSetEventStatus',adminSession:adminSession,eventId:eventId,status:status}).then(function(){
+    try{localStorage.removeItem(ACTIVE_EVENTS_CACHE)}catch(e){}
+    toast(status==='HIDDEN'?'Мероприятие скрыто':'Мероприятие снова видно');
+    adminHome();
+  }).catch(function(e){toast('Не удалось изменить видимость: '+e.message)});
+}
+
+window.copyText=function(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){toast('Ссылка скопирована')}).catch(function(){fallbackCopy(text)});
+  }else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('Ссылка скопирована')}catch(e){prompt('Скопируйте ссылку',text)}
+  document.body.removeChild(ta);
+}
+window.createReportLink=function(eventId){
+  toast('Формируем ZIP…');
+  post({action:'adminCreateReportLink',adminSession:adminSession,eventId:eventId}).then(function(r){
+    modal('<div class="sheet-head"><div class="sheet-title">Фотоотчет готов</div><button class="icon" onclick="adminHome()">×</button></div>'+
+      '<div class="page-sub">'+(r.publicLink?'Ссылка доступна получателю без входа в ваш Google-аккаунт.':'Google запретил публичный доступ для этого аккаунта. Ссылка может потребовать доступ.')+'</div>'+
+      '<div class="label">Ссылка на скачивание ZIP</div><div class="linkbox">'+esc(r.downloadUrl)+'</div>'+
+      '<button class="btn btn-primary" style="margin-top:10px" onclick="copyText(\''+js(r.downloadUrl)+'\')">Копировать ссылку</button>'+
+      '<button class="btn btn-soft" style="margin-top:8px" onclick="window.open(\''+js(r.driveUrl)+'\',\'_blank\')">Открыть в Google Drive</button>');
+  }).catch(function(e){toast('Не удалось создать ZIP: '+e.message)});
+}
+
+var draft=null;
+var editorMode='new';
+
+window.newEvent=function(){
+  editorMode='new';
+  draft={eventId:'',name:'',startDate:'',endDate:'',days:[{dayId:'',name:'День 1',date:'',locations:[]}]};
+  window.draft=draft;
+  eventEditor(0);
+}
+
+window.editEvent=function(eventId){
+  toast('Открываем ТЗ…');
+  post({action:'adminGetEvent',adminSession:adminSession,eventId:eventId}).then(function(r){
+    editorMode='edit';draft=r.eventSpec;window.draft=draft;eventEditor(0);
+  }).catch(function(e){toast('Не удалось открыть: '+e.message)});
+}
+
+function rememberEditorScroll(){
+  var sh=document.querySelector('#overlay .sheet');
+  return sh?sh.scrollTop:0;
+}
+function eventEditor(scrollTop){
+  window.draft=draft;
+  var html='<div class="sheet-head"><div class="sheet-title">'+(editorMode==='edit'?'Редактирование':'Новое мероприятие')+'</div><button class="icon" onclick="adminHome()">×</button></div>'+
+    '<div class="label">Название</div><input class="field" value="'+esc(draft.name)+'" oninput="setDraftField(\'name\',this.value)">'+
+    '<div class="two"><div><div class="label">Начало</div><input class="field" type="date" value="'+esc(draft.startDate)+'" oninput="setDraftField(\'startDate\',this.value)"></div>'+
+    '<div><div class="label">Окончание</div><input class="field" type="date" value="'+esc(draft.endDate)+'" oninput="setDraftField(\'endDate\',this.value)"></div></div>';
+
+  draft.days.forEach(function(d,di){
+    html+='<div class="block"><div class="block-head"><b>День '+(di+1)+'</b>'+(draft.days.length>1?'<button class="mini mini-danger" onclick="removeDay('+di+')">Удалить</button>':'')+'</div>'+
+      '<input class="field" style="margin-top:9px" placeholder="Название дня" value="'+esc(d.name)+'" oninput="setDayField('+di+',\'name\',this.value)">'+
+      '<input class="field" style="margin-top:8px" type="date" value="'+esc(d.date)+'" oninput="setDayField('+di+',\'date\',this.value)">';
+
+    d.locations.forEach(function(l,li){
+      html+='<div class="block"><div class="block-head"><b>Локация '+(li+1)+'</b><button class="mini mini-danger" onclick="removeLocation('+di+','+li+')">×</button></div>'+
+        '<input class="field" style="margin-top:9px" placeholder="Например: Регистрация" value="'+esc(l.name)+'" oninput="setLocationField('+di+','+li+',\'name\',this.value)">';
+
+      l.tasks.forEach(function(t,ti){
+        html+='<div class="block"><div class="block-head"><b>Объект '+(ti+1)+'</b><button class="mini mini-danger" onclick="removeObject('+di+','+li+','+ti+')">×</button></div>'+
+          '<input class="field" style="margin-top:9px" placeholder="Стол, принтер, автобус…" value="'+esc(t.name)+'" oninput="setTaskField('+di+','+li+','+ti+',\'name\',this.value)">'+
+          '<div class="two"><input class="field" type="number" min="0" placeholder="Мин. фото" value="'+(t.minPhotos||'')+'" oninput="setTaskField('+di+','+li+','+ti+',\'minPhotos\',Number(this.value||0))">'+
+          '<input class="field" type="number" min="0" placeholder="Макс. фото (0 = без лимита)" value="'+(t.maxPhotos||'')+'" oninput="setTaskField('+di+','+li+','+ti+',\'maxPhotos\',Number(this.value||0))"></div>'+
+          '<textarea class="field" placeholder="Что именно нужно сфотографировать" oninput="setTaskField('+di+','+li+','+ti+',\'instruction\',this.value)">'+esc(t.instruction||'')+'</textarea>'+
+          ((t.status==='DONE'||Number(t.photoCount)>0)?'<div class="meta">Существующее выполненное/с фотографиями задание защищено от случайного удаления.</div>':'')+
+          '</div>';
+      });
+      html+='<button class="mini" onclick="addObject('+di+','+li+')">＋ Объект</button></div>';
+    });
+    html+='<button class="mini" onclick="addLocation('+di+')">＋ Локация</button></div>';
+  });
+
+  html+='<button class="btn btn-soft" onclick="addDay()">＋ Добавить день</button>'+
+    '<button id="saveEventBtn" class="btn btn-ok" style="margin-top:9px" onclick="saveEvent()">'+(editorMode==='edit'?'Сохранить изменения':'Создать мероприятие')+'</button>';
+  modal(html);
+
+  var sh=document.querySelector('#overlay .sheet');
+  if(sh) requestAnimationFrame(function(){sh.scrollTop=scrollTop||0});
+}
+
+window.setDraftField=function(k,v){draft[k]=v}
+window.setDayField=function(di,k,v){draft.days[di][k]=v}
+window.setLocationField=function(di,li,k,v){draft.days[di].locations[li][k]=v}
+window.setTaskField=function(di,li,ti,k,v){draft.days[di].locations[li].tasks[ti][k]=v}
+
+function rerenderKeepScroll(){
+  var y=rememberEditorScroll();
+  eventEditor(y);
+}
+window.addDay=function(){draft.days.push({dayId:'',name:'День '+(draft.days.length+1),date:'',locations:[]});rerenderKeepScroll()}
+window.removeDay=function(i){if(confirm('Удалить этот день из ТЗ?')){draft.days.splice(i,1);rerenderKeepScroll()}}
+window.addLocation=function(di){draft.days[di].locations.push({locationId:'',name:'',tasks:[]});rerenderKeepScroll()}
+window.removeLocation=function(di,li){if(confirm('Удалить эту локацию из ТЗ?')){draft.days[di].locations.splice(li,1);rerenderKeepScroll()}}
+window.addObject=function(di,li){draft.days[di].locations[li].tasks.push({taskId:'',name:'',minPhotos:0,maxPhotos:0,instruction:'',status:'OPEN',photoCount:0});rerenderKeepScroll()}
+window.removeObject=function(di,li,ti){if(confirm('Удалить этот объект из ТЗ?')){draft.days[di].locations[li].tasks.splice(ti,1);rerenderKeepScroll()}}
+
+window.saveEvent=function(){
+  if(!draft||!String(draft.name||'').trim()){toast('Введите название мероприятия');return}
+  var hasTask=false;
+  draft.days.forEach(function(d){(d.locations||[]).forEach(function(l){if((l.tasks||[]).length)hasTask=true})});
+  if(!hasTask){toast('Добавьте хотя бы один объект фотоотчёта');return}
+
+  var b=el('saveEventBtn');
+  if(b){b.disabled=true;b.textContent=editorMode==='edit'?'Сохраняем…':'Создаём…'}
+
+  var action=editorMode==='edit'?'adminUpdateEvent':'adminCreateEvent';
+  post({action:action,adminSession:adminSession,eventSpec:draft}).then(function(r){
+    try{localStorage.removeItem(ACTIVE_EVENTS_CACHE)}catch(e){}
+    var note='';
+    if(r.protectedTasks&&r.protectedTasks.length){
+      note='<div class="page-sub">Некоторые уже выполненные задания не удалены, чтобы не потерять существующий фотоотчет.</div>';
+    }
+    modal('<div class="sheet-head"><div class="sheet-title">'+(editorMode==='edit'?'Изменения сохранены':'Мероприятие создано')+'</div><button class="icon" onclick="adminHome()">×</button></div>'+
+      note+'<div class="note"><b>'+esc(draft.name)+'</b><br>'+esc(dateRange(draft.startDate,draft.endDate))+'</div>'+
+      (r.token?'<button class="btn btn-primary" onclick="openAdminEvent(\''+js(r.token)+'\')">Открыть мероприятие</button>':'')+
+      (r.driveUrl?'<button class="btn btn-soft" style="margin-top:8px" onclick="openExternal(\''+js(r.driveUrl)+'\')">Открыть папку Drive</button>':'')+
+      (r.spreadsheetUrl?'<button class="btn btn-soft" style="margin-top:8px" onclick="openExternal(\''+js(r.spreadsheetUrl)+'\')">Открыть таблицу</button>':'')+
+      (r.workerUrl?'<button class="btn btn-soft" style="margin-top:8px" onclick="copyText(\''+js(r.workerUrl)+'\')">Копировать ссылку сотрудникам</button>':'')+
+      '<button class="btn btn-soft" style="margin-top:8px" onclick="adminHome()">К списку мероприятий</button>');
+  }).catch(function(e){
+    toast('Не удалось сохранить: '+e.message);
+    if(b){b.disabled=false;b.textContent=editorMode==='edit'?'Сохранить изменения':'Создать мероприятие'}
+  });
+}
+
+window.addEventListener('error',function(e){
+  try{console.error(e.error||e.message||e)}catch(_){}
+});
+window.addEventListener('unhandledrejection',function(e){
+  try{console.error(e.reason||e)}catch(_){}
+});
+
+start();
 })();
 </script>
 </body>
