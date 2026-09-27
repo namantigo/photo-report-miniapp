@@ -113,7 +113,7 @@ function jsonp(url){
   return new Promise(function(resolve,reject){
     var callback='photoReportResponse'+(++jsonpCounter);
     var script=document.createElement('script'),done=false;
-    var timer=setTimeout(function(){finish(new Error('Нет ответа от Apps Script: проверьте URL и доступ «Все»'))},20000);
+    var timer=setTimeout(function(){finish(new Error('Сервер не ответил вовремя'))},35000);
     function finish(error,result){
       if(done)return;
       done=true;clearTimeout(timer);delete window[callback];
@@ -121,7 +121,7 @@ function jsonp(url){
       if(error)reject(error);else resolve(result);
     }
     window[callback]=function(result){finish(null,result)};
-    script.onerror=function(){finish(new Error('Не удалось загрузить ответ Apps Script: проверьте URL и доступ «Все»'))};
+    script.onerror=function(){finish(new Error('Не удалось загрузить ответ сервера'))};
     script.src=url+(url.indexOf('?')===-1?'?':'&')+'callback='+callback;
     document.head.appendChild(script);
   });
@@ -134,7 +134,7 @@ function waitForPostResult(id){
   var deadline=Date.now()+90000;
   function poll(){
     if(Date.now()>deadline)throw new Error('Ответ не получен. Проверьте результат действия перед повтором');
-    return jsonp(API_URL+'?action=result&id='+id+'&part=0&t='+Date.now()).then(function(first){
+    return request('GET',API_URL+'?action=result&id='+id+'&part=0&t='+Date.now()).then(function(first){
       if(first.ok===false)throw new Error(first.error||first.code||'Ошибка сервера');
       if(first.status!=='ready'){
         return new Promise(function(resolve){setTimeout(resolve,850)}).then(poll);
@@ -143,7 +143,7 @@ function waitForPostResult(id){
       function collect(){
         if(part>=first.total)return JSON.parse(chunks.join(''));
         var index=part++;
-        return jsonp(API_URL+'?action=result&id='+id+'&part='+index+'&t='+Date.now()).then(function(next){
+        return request('GET',API_URL+'?action=result&id='+id+'&part='+index+'&t='+Date.now()).then(function(next){
           if(next.ok===false)throw new Error(next.error||next.code||'Ошибка сервера');
           if(next.status!=='ready'||next.part!==index)throw new Error('Ответ сервера устарел. Проверьте результат действия перед повтором');
           chunks.push(next.chunk);return collect();
@@ -155,7 +155,10 @@ function waitForPostResult(id){
   return poll();
 }
 function request(method,url,body){
-  if(method==='GET')return jsonp(url);
+  if(method==='GET')return jsonp(url).catch(function(){
+    // A GET can safely be repeated after a temporary network error.
+    return new Promise(function(resolve){setTimeout(resolve,800)}).then(function(){return jsonp(url)});
+  });
   if(method!=='POST')return Promise.reject(new Error('Неизвестный метод запроса'));
   var payload={};Object.keys(body||{}).forEach(function(k){payload[k]=body[k]});
   var id=newRequestId();payload.requestId=id;
@@ -206,11 +209,14 @@ function start(){
 }
 function loadEvent(key){
   eventKey=String(key||'');
+  var requestedKey=eventKey;
   getData().then(function(d){
+    if(eventKey!==requestedKey)return;
     state.data=d;state.dayId=null;state.locationId=null;state.taskId=null;
     photoLoaded={};localThumbs={};
     renderDays();
   }).catch(function(e){
+    if(eventKey!==requestedKey)return;
     el('app').innerHTML='<div class="error"><b>Не удалось открыть фотоотчёт</b><br><br>'+esc(e.message)+'<br><br><button class="btn btn-soft" onclick="renderEventChooser()">К мероприятиям</button></div>';
   });
 }
