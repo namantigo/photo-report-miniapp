@@ -64,7 +64,7 @@ button{cursor:pointer}
 (function(){
 'use strict';
 
-var API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
+var API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZP6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
 var tg=window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 if(tg){tg.ready();tg.expand()}
 
@@ -85,7 +85,7 @@ var photoLoaded={};
 var openedFromEventList=false;
 var adminSession=sessionStorage.getItem('fr_admin_session')||'';
 var myTasksCache=null;
-var ACTIVE_EVENTS_CACHE='fr_active_events_v8';
+var ACTIVE_EVENTS_CACHE='fr_active_events_v9';
 
 function el(id){return document.getElementById(id)}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
@@ -112,16 +112,27 @@ function request(method,url,body){
   return new Promise(function(resolve,reject){
     var xhr=new XMLHttpRequest();
     xhr.open(method,url,true);
-    xhr.timeout=45000;
+    xhr.timeout=25000;
     xhr.onreadystatechange=function(){
       if(xhr.readyState!==4)return;
-      if(xhr.status<200||xhr.status>=400){reject(new Error('HTTP '+xhr.status));return}
+      if(xhr.status<200||xhr.status>=400){
+        if(xhr.status===404)reject(new Error('HTTP 404: не найден Apps Script Web App'));
+        else reject(new Error('HTTP '+xhr.status));
+        return
+      }
       try{resolve(JSON.parse(xhr.responseText))}catch(e){reject(new Error('Сервер вернул некорректный ответ'))}
     };
     xhr.onerror=function(){reject(new Error('Нет соединения с сервером'))};
     xhr.ontimeout=function(){reject(new Error('Сервер отвечает слишком долго'))};
     if(method==='POST')xhr.setRequestHeader('Content-Type','text/plain;charset=utf-8');
     xhr.send(body?JSON.stringify(body):null);
+  });
+}
+function getPublicEvents(){
+  var url=API_URL+'?action=events&t='+Date.now();
+  return request('GET',url,null).then(function(r){
+    if(!r.ok)throw new Error(r.code||r.error||'Ошибка загрузки мероприятий');
+    return r.events||[];
   });
 }
 function getData(){
@@ -190,9 +201,9 @@ window.renderEventChooser=function(){
     if(cached&&Array.isArray(cached.events))renderEventCards(cached.events);
   }catch(e){}
 
-  post({action:'listActiveEvents'}).then(function(r){
-    renderEventCards(r.events||[]);
-    try{localStorage.setItem(ACTIVE_EVENTS_CACHE,JSON.stringify({events:r.events||[],ts:Date.now()}))}catch(e){}
+  getPublicEvents().then(function(events){
+    renderEventCards(events);
+    try{localStorage.setItem(ACTIVE_EVENTS_CACHE,JSON.stringify({events:events,ts:Date.now()}))}catch(e){}
   }).catch(function(e){
     var target=el('eventList');
     if(target&&!target.querySelector('.card'))target.innerHTML='<div class="error">'+esc(e.message)+'</div>';
