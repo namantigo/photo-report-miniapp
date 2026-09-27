@@ -661,6 +661,15 @@ function eventEditor(scrollTop){
       '<input class="field" style="margin-top:9px" placeholder="Название дня" value="'+esc(d.name)+'" oninput="setDayField('+di+',\'name\',this.value)">'+
       '<input class="field" style="margin-top:8px" type="date" value="'+esc(d.date)+'" oninput="setDayField('+di+',\'date\',this.value)">';
 
+    if(draft.days.length>1 && d.locations.length){
+      html+='<div class="label">Скопировать наполнение в другой день</div>'+
+        '<div class="two"><select id="copyDayTarget'+di+'" class="field">';
+      draft.days.forEach(function(target,ti){
+        if(ti!==di)html+='<option value="'+ti+'">День '+(ti+1)+' · '+esc(target.name||'Без названия')+'</option>';
+      });
+      html+='</select><button class="mini" onclick="copyDayContents('+di+')">Копировать</button></div>';
+    }
+
     d.locations.forEach(function(l,li){
       html+='<div class="block"><div class="block-head"><b>Локация '+(li+1)+'</b><button class="mini mini-danger" onclick="removeLocation('+di+','+li+')">×</button></div>'+
         '<input class="field" style="margin-top:9px" placeholder="Например: Регистрация" value="'+esc(l.name)+'" oninput="setLocationField('+di+','+li+',\'name\',this.value)">';
@@ -697,6 +706,29 @@ function rerenderKeepScroll(){
   eventEditor(y);
 }
 window.addDay=function(){draft.days.push({dayId:'',name:'День '+(draft.days.length+1),date:'',locations:[]});rerenderKeepScroll()}
+window.copyDayContents=function(sourceIndex){
+  var select=el('copyDayTarget'+sourceIndex);
+  var targetIndex=select?Number(select.value):-1;
+  var source=draft&&draft.days[sourceIndex],target=draft&&draft.days[targetIndex];
+  if(!source||!target||sourceIndex===targetIndex||!source.locations.length)return;
+  var total=source.locations.reduce(function(n,location){return n+(location.tasks||[]).length},0);
+  if(!confirm('Добавить '+source.locations.length+' локаций и '+total+' объектов из дня '+(sourceIndex+1)+' в день '+(targetIndex+1)+'? Существующее содержимое сохранится. Фото и назначения не копируются.'))return;
+  var copied=source.locations.map(function(location){
+    return {
+      locationId:'',name:location.name,
+      tasks:(location.tasks||[]).map(function(task){
+        return {
+          taskId:'',name:task.name,
+          minPhotos:Number(task.minPhotos||0),maxPhotos:Number(task.maxPhotos||0),
+          instruction:String(task.instruction||''),status:'OPEN',photoCount:0
+        };
+      })
+    };
+  });
+  target.locations=target.locations.concat(copied);
+  rerenderKeepScroll();
+  toast('Наполнение скопировано. Нажмите «Сохранить изменения»');
+}
 window.removeDay=function(i){if(confirm('Удалить этот день из ТЗ?')){draft.days.splice(i,1);rerenderKeepScroll()}}
 window.addLocation=function(di){draft.days[di].locations.push({locationId:'',name:'',tasks:[]});rerenderKeepScroll()}
 window.removeLocation=function(di,li){if(confirm('Удалить эту локацию из ТЗ?')){draft.days[di].locations.splice(li,1);rerenderKeepScroll()}}
