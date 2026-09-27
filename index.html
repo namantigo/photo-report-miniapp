@@ -64,7 +64,7 @@ button{cursor:pointer}
 (function(){
 'use strict';
 
-var API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZp6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
+var API_URL='https://script.google.com/macros/s/AKfycbz449Moj-8zWz28NfTFWZP6-YInnVtHYxLnC8IzDDCbhouvr1dwhC_UtBwFttSwk9vxoA/exec';
 var tg=window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 if(tg){tg.ready();tg.expand()}
 
@@ -108,46 +108,62 @@ function toast(s){var d=document.createElement('div');d.className='toast';d.text
 function modal(html){el('overlay').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheet-bar"></div>'+html+'</div></div>'}
 window.closeModal=function(){el('overlay').innerHTML=''}
 
-var bridgeFrame=null,bridgeWindow=null,bridgeNonce='',bridgeReady=null,bridgePending={},bridgeSeq=0;
-window.addEventListener('message',function(e){
-  if(!bridgeFrame||!e.data||e.data.nonce!==bridgeNonce)return;
-  if(e.data.type==='fr-bridge-ready'){
-    bridgeWindow=e.source;
-    if(bridgeReady)bridgeReady.resolve();
-  }else if(e.data.type==='fr-bridge-response'){
-    if(e.source!==bridgeWindow)return;
-    var pending=bridgePending[e.data.id];
-    if(!pending)return;
-    delete bridgePending[e.data.id];clearTimeout(pending.timer);
-    if(e.data.error)pending.reject(new Error(e.data.error));
-    else pending.resolve(e.data.result);
-  }
-});
-function ensureBridge(){
-  if(bridgeReady)return bridgeReady.promise;
-  var bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);
-  bridgeNonce=Array.prototype.map.call(bytes,function(b){return ('0'+b.toString(16)).slice(-2)}).join('');
-  bridgeReady={};
-  bridgeReady.promise=new Promise(function(resolve,reject){
-    var timer=setTimeout(function(){reject(new Error('Не удалось подключиться к Apps Script. Проверьте адрес и доступ к Web App'))},15000);
-    bridgeReady.resolve=function(){clearTimeout(timer);resolve()};
+var jsonpCounter=0;
+function jsonp(url){
+  return new Promise(function(resolve,reject){
+    var callback='photoReportResponse'+(++jsonpCounter);
+    var script=document.createElement('script'),done=false;
+    var timer=setTimeout(function(){finish(new Error('Нет ответа от Apps Script: проверьте URL и доступ «Все»'))},20000);
+    function finish(error,result){
+      if(done)return;
+      done=true;clearTimeout(timer);delete window[callback];
+      if(script.parentNode)script.parentNode.removeChild(script);
+      if(error)reject(error);else resolve(result);
+    }
+    window[callback]=function(result){finish(null,result)};
+    script.onerror=function(){finish(new Error('Не удалось загрузить ответ Apps Script: проверьте URL и доступ «Все»'))};
+    script.src=url+(url.indexOf('?')===-1?'?':'&')+'callback='+callback;
+    document.head.appendChild(script);
   });
-  bridgeFrame=document.createElement('iframe');
-  bridgeFrame.style.display='none';
-  bridgeFrame.setAttribute('title','Соединение с сервером');
-  bridgeFrame.src=API_URL+'?action=bridge&nonce='+bridgeNonce;
-  document.body.appendChild(bridgeFrame);
-  return bridgeReady.promise;
+}
+function newRequestId(){
+  var bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);
+  return Array.prototype.map.call(bytes,function(b){return ('0'+b.toString(16)).slice(-2)}).join('');
+}
+function waitForPostResult(id){
+  var deadline=Date.now()+90000;
+  function poll(){
+    if(Date.now()>deadline)throw new Error('Ответ не получен. Проверьте результат действия перед повтором');
+    return jsonp(API_URL+'?action=result&id='+id+'&part=0&t='+Date.now()).then(function(first){
+      if(first.ok===false)throw new Error(first.error||first.code||'Ошибка сервера');
+      if(first.status!=='ready'){
+        return new Promise(function(resolve){setTimeout(resolve,850)}).then(poll);
+      }
+      var chunks=[first.chunk],part=1;
+      function collect(){
+        if(part>=first.total)return JSON.parse(chunks.join(''));
+        var index=part++;
+        return jsonp(API_URL+'?action=result&id='+id+'&part='+index+'&t='+Date.now()).then(function(next){
+          if(next.ok===false)throw new Error(next.error||next.code||'Ошибка сервера');
+          if(next.status!=='ready'||next.part!==index)throw new Error('Ответ сервера устарел. Проверьте результат действия перед повтором');
+          chunks.push(next.chunk);return collect();
+        });
+      }
+      return collect();
+    });
+  }
+  return poll();
 }
 function request(method,url,body){
-  return ensureBridge().then(function(){
-    return new Promise(function(resolve,reject){
-      var id=++bridgeSeq;
-      var timer=setTimeout(function(){delete bridgePending[id];reject(new Error('Сервер отвечает слишком долго'))},25000);
-      bridgePending[id]={resolve:resolve,reject:reject,timer:timer};
-      bridgeWindow.postMessage({type:'fr-bridge-request',nonce:bridgeNonce,id:id,method:method,url:url,body:body},'*');
-    });
-  });
+  if(method==='GET')return jsonp(url);
+  if(method!=='POST')return Promise.reject(new Error('Неизвестный метод запроса'));
+  var payload={};Object.keys(body||{}).forEach(function(k){payload[k]=body[k]});
+  var id=newRequestId();payload.requestId=id;
+  return fetch(url,{
+    method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(payload)
+  }).then(function(){return waitForPostResult(id)});
 }
 function getPublicEvents(){
   var url=API_URL+'?action=events&t='+Date.now();
