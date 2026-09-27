@@ -31,7 +31,7 @@ button{cursor:pointer}
 .page-title{font-size:28px;line-height:1.08;font-weight:820;letter-spacing:-.7px;margin:0 0 6px}.page-sub{color:var(--muted);font-size:14px;line-height:1.45;margin-bottom:18px}
 .back{border:0;background:transparent;color:var(--primary);padding:2px 0 14px;font-weight:650}
 .card{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:18px;padding:16px;margin:0 0 10px;text-align:left;box-shadow:0 3px 16px rgba(15,23,42,.035)}
-.card-row{display:flex;align-items:center;gap:13px}.badge{min-width:46px;height:46px;padding:0 8px;border-radius:14px;background:rgba(37,99,235,.1);color:var(--primary);font-weight:800;display:grid;place-items:center}
+.card-row{display:flex;align-items:center;gap:13px;min-width:0}.badge{width:46px;min-width:46px;max-width:46px;height:46px;padding:0;border-radius:14px;background:rgba(37,99,235,.1);color:var(--primary);font-weight:800;display:grid;place-items:center;overflow:hidden;white-space:nowrap}.grow{min-width:0;flex:1}
 .grow{flex:1;min-width:0}.card-title{font-size:17px;font-weight:730;line-height:1.25}.meta{font-size:13px;color:var(--muted);margin-top:5px}.mine{color:var(--ok);font-weight:650}.busy{color:var(--warn);font-weight:650}.chev{font-size:24px;color:var(--muted);opacity:.55}
 .task-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}.task-num{padding:8px 11px;border-radius:11px;background:rgba(37,99,235,.1);color:var(--primary);font-weight:800}.task-name{font-size:27px;font-weight:820;letter-spacing:-.5px;line-height:1.08}
 .note{border:1px solid var(--line);background:var(--card);padding:14px;border-radius:15px;line-height:1.45;margin:12px 0 16px}.counter{display:flex;align-items:center;justify-content:space-between;margin:16px 1px 10px}.counter strong{font-size:20px}
@@ -97,6 +97,10 @@ function dateRange(a,b){
   a=fmtDate(a);b=fmtDate(b);
   if(a&&b&&a!==b)return a+' — '+b;
   return a||b||'';
+}
+function safeTaskNumber(n,fallback){
+  n=String(n==null?'':n).trim();
+  return /^\d+(?:\.\d+)*$/.test(n)?n:String(fallback||'');
 }
 function toast(s){var d=document.createElement('div');d.className='toast';d.textContent=s;document.body.appendChild(d);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},1900)}
 function modal(html){el('overlay').innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheet-bar"></div>'+html+'</div></div>'}
@@ -213,10 +217,12 @@ window.renderTasks=function(){
   var html='<div class="shell">'+brand(d.event.name)+back('renderLocations()','К локациям')+'<h1 class="page-title">'+esc(l?l.name:'Задания')+'</h1><div class="page-sub">Выберите объект фотоотчёта</div>';
   var ts=d.tasks.filter(function(t){return t.locationId===state.locationId&&t.status!=='DONE'}).sort(function(a,b){return String(a.number).localeCompare(String(b.number),undefined,{numeric:true})});
   if(!ts.length)html+='<div class="empty">✓ Все задания выполнены</div>';
-  ts.forEach(function(t){
+  ts.forEach(function(t,ti){
     var st='<div class="meta">Готово к выполнению</div>';
     if(t.status==='IN_PROGRESS')st=String(t.reservedBy)===telegramUserId?'<div class="meta mine">● Ваше задание</div>':'<div class="meta busy">● Выполняется другим участником</div>';
-    html+='<button class="card" onclick="openTask(\''+js(t.taskId)+'\')"><div class="card-row"><div class="badge">'+esc(t.number)+'</div><div class="grow"><div class="card-title">'+esc(t.name)+'</div>'+st+'</div><div class="chev">›</div></div></button>';
+    var fallbackNo=(l&&l.number?String(l.number):'1')+'.'+String(ti+1);
+    var shownNo=safeTaskNumber(t.number,fallbackNo);
+    html+='<button class="card" onclick="openTask(\''+js(t.taskId)+'\')"><div class="card-row"><div class="badge">'+esc(shownNo)+'</div><div class="grow"><div class="card-title">'+esc(t.name)+'</div>'+st+'</div><div class="chev">›</div></div></button>';
   });
   html+='</div>';el('app').innerHTML=html;
 }
