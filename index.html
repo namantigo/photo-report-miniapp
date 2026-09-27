@@ -56,7 +56,6 @@ button{cursor:pointer}
     <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
   </div>
 </div>
-<input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 <input id="galleryInput" type="file" accept="image/*" multiple hidden>
 <div id="overlay"></div>
 
@@ -79,7 +78,7 @@ try{
 }catch(e){}
 if(!eventKey && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) eventKey=String(tg.initDataUnsafe.start_param);
 
-var state={data:null,dayId:null,locationId:null,taskId:null,uploading:false,fromMyTasks:false};
+var state={data:null,dayId:null,locationId:null,taskId:null,uploading:false,actionPending:false,fromMyTasks:false};
 var localThumbs={};
 var photoLoaded={};
 var openedFromEventList=false;
@@ -337,7 +336,7 @@ window.renderTask=function(){
   ps.forEach(function(p){
     var src=localThumbs[p.photoId]||p.thumbnailBase64||'';
     var visual=src?'<img src="'+esc(src)+'" alt="">':'<div class="photo-file">📷<br>'+esc(p.fileName)+'</div>';
-    html+='<div class="photo">'+visual+'<button class="close-photo" onclick="deletePhoto(\''+js(p.photoId)+'\')">×</button>'+(p.uploading?'<div class="upload-mask"><div class="ring"></div></div>':'')+'</div>';
+    html+='<div class="photo">'+visual+'<button class="close-photo" onclick="deletePhoto(\''+js(p.photoId)+'\')" '+(state.uploading||state.actionPending?'disabled':'')+'>×</button>'+(p.uploading?'<div class="upload-mask"><div class="ring"></div></div>':'')+'</div>';
   });
   if(!photoLoaded[t.taskId]&&count>ps.length){
     for(var pi=ps.length;pi<count;pi++){
@@ -345,26 +344,21 @@ window.renderTask=function(){
     }
   }
   html+='</div><div class="actions">'+
-    '<button class="btn btn-primary" onclick="camera()" '+(state.uploading||maxed?'disabled':'')+'>📷 Сделать фото</button>'+
-    '<button class="btn btn-soft" onclick="gallery()" '+(state.uploading||maxed?'disabled':'')+'>Выбрать из галереи</button>'+
-    '<button class="btn btn-ok" onclick="finishTask()" '+(state.uploading||count<required?'disabled':'')+'>Завершить задание</button>'+
-    '</div><div class="danger-zone"><button class="btn btn-danger" onclick="cancelTask()" '+(state.uploading?'disabled':'')+'>Отказаться от задания</button></div></div>';
+    '<button class="btn btn-soft" onclick="gallery()" '+(state.uploading||state.actionPending||maxed?'disabled':'')+'>Добавить фото</button>'+
+    '<button class="btn btn-ok" onclick="finishTask()" '+(state.uploading||state.actionPending||count<required?'disabled':'')+'>Завершить задание</button>'+
+    '</div><div class="danger-zone"><button class="btn btn-danger" onclick="cancelTask()" '+(state.uploading||state.actionPending?'disabled':'')+'>Отказаться от задания</button></div></div>';
   el('app').innerHTML=html;
 }
-window.camera=function(){if(!state.uploading)el('cameraInput').click()}
-window.gallery=function(){if(!state.uploading)el('galleryInput').click()}
+window.gallery=function(){if(!state.uploading&&!state.actionPending)el('galleryInput').click()}
 
-el('cameraInput').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(f)uploadFiles([f]);e.target.value=''});
 el('galleryInput').addEventListener('change',function(e){var a=Array.prototype.slice.call(e.target.files||[]);if(a.length)uploadFiles(a);e.target.value=''});
 
 function prepareImage(file){
   return new Promise(function(resolve,reject){
-    var r=new FileReader();
-    r.onerror=reject;
-    r.onload=function(ev){
-      var img=new Image();
-      img.onerror=reject;
-      img.onload=function(){
+    var img=new Image(),objectUrl=null;
+    img.onerror=function(e){if(objectUrl)URL.revokeObjectURL(objectUrl);reject(e)};
+    img.onload=function(){
+      try{
         function draw(max,quality){
           var w=img.width,h=img.height;
           if(w>max||h>max){var q=Math.min(max/w,max/h);w=Math.round(w*q);h=Math.round(h*q)}
@@ -374,10 +368,18 @@ function prepareImage(file){
         }
         // One decode of the original image creates both the report image and thumbnail.
         resolve({full:draw(1080,.68),thumb:draw(140,.42)});
-      };
-      img.src=ev.target.result;
+      }catch(e){reject(e)}
+      if(objectUrl)URL.revokeObjectURL(objectUrl);
     };
-    r.readAsDataURL(file);
+    if(window.URL&&URL.createObjectURL){
+      objectUrl=URL.createObjectURL(file);
+      img.src=objectUrl;
+    }else{
+      var reader=new FileReader();
+      reader.onerror=reject;
+      reader.onload=function(e){img.src=e.target.result};
+      reader.readAsDataURL(file);
+    }
   });
 }
 async function sendPreparedBatch(batch,t,taskId){
@@ -403,6 +405,7 @@ async function sendPreparedBatch(batch,t,taskId){
   if(state.taskId===taskId)renderTask();
 }
 async function uploadFiles(files){
+  if(state.uploading||state.actionPending)return;
   var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(!t)return;
   var existing=Number(t.photoCount||taskPhotos().length||0);
   if(t.maxPhotos>0)files=files.slice(0,Math.max(0,t.maxPhotos-existing));
@@ -458,6 +461,7 @@ async function uploadFiles(files){
 }
 
 window.deletePhoto=function(id){
+  if(state.uploading||state.actionPending)return;
   if(!confirm('Удалить эту фотографию?'))return;
   var p=state.data.photos.find(function(x){return x.photoId===id});if(!p)return;
   state.data.photos=state.data.photos.filter(function(x){return x.photoId!==id});renumberLocal();renderTask();
@@ -465,23 +469,29 @@ window.deletePhoto=function(id){
 }
 function renumberLocal(){var ps=taskPhotos();ps.forEach(function(p,i){p.number=i+1});var t=state.data.tasks.find(function(x){return x.taskId===state.taskId});if(t)t.photoCount=ps.length}
 window.finishTask=function(){
+  if(state.uploading||state.actionPending)return;
   var id=state.taskId,t=state.data.tasks.find(function(x){return x.taskId===id});if(!t||!confirm('Завершить задание?'))return;
   var fromMine=state.fromMyTasks;
+  state.actionPending=true;renderTask();
   post({action:'finishTask',taskId:id}).then(function(){
+    state.actionPending=false;
     t.status='DONE';t.reservedBy='';myTasksCache=null;
     if(fromMine)openMyTasks();else renderTasks();
-  }).catch(function(e){toast('Не удалось завершить: '+e.message)});
+  }).catch(function(e){state.actionPending=false;if(state.taskId===id)renderTask();toast('Не удалось завершить: '+e.message)});
 }
 
 window.cancelTask=function(){
+  if(state.uploading||state.actionPending)return;
   var id=state.taskId,t=state.data.tasks.find(function(x){return x.taskId===id});if(!t||!confirm('Отказаться от задания? Загруженные в него фото будут удалены.'))return;
   var fromMine=state.fromMyTasks;
+  state.actionPending=true;renderTask();
   post({action:'cancelTask',taskId:id}).then(function(){
+    state.actionPending=false;
     t.status='OPEN';t.reservedBy='';t.photoCount=0;
     state.data.photos=state.data.photos.filter(function(p){return p.taskId!==id});
     myTasksCache=null;
     if(fromMine)openMyTasks();else renderTasks();
-  }).catch(function(e){toast('Отказ не выполнен: '+e.message)});
+  }).catch(function(e){state.actionPending=false;if(state.taskId===id)renderTask();toast('Отказ не выполнен: '+e.message)});
 }
 
 
