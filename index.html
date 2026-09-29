@@ -129,8 +129,8 @@ function newRequestId(){
   var bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);
   return Array.prototype.map.call(bytes,function(b){return ('0'+b.toString(16)).slice(-2)}).join('');
 }
-function waitForPostResult(id){
-  var deadline=Date.now()+90000;
+function waitForPostResult(id,timeoutMs){
+  var deadline=Date.now()+(timeoutMs||90000);
   function poll(){
     if(Date.now()>deadline)throw new Error('Ответ не получен. Проверьте результат действия перед повтором');
     return request('GET',API_URL+'?action=result&id='+id+'&part=0&t='+Date.now()).then(function(first){
@@ -153,7 +153,7 @@ function waitForPostResult(id){
   }
   return poll();
 }
-function request(method,url,body){
+function request(method,url,body,timeoutMs){
   if(method==='GET')return jsonp(url).catch(function(){
     // A GET can safely be repeated after a temporary network error.
     return new Promise(function(resolve){setTimeout(resolve,800)}).then(function(){return jsonp(url)});
@@ -165,7 +165,7 @@ function request(method,url,body){
     method:'POST',mode:'no-cors',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify(payload)
-  }).then(function(){return waitForPostResult(id)});
+  }).then(function(){return waitForPostResult(id,timeoutMs)});
 }
 function getPublicEvents(){
   var url=API_URL+'?action=events&t='+Date.now();
@@ -187,7 +187,9 @@ function post(body){
   Object.keys(body||{}).forEach(function(k){payload[k]=body[k]});
   payload.initData=initData;
   payload.event=eventKey;
-  return request('POST',API_URL,payload).then(function(r){
+  // A detailed specification can take longer while Drive folders are created.
+  var timeout=(payload.action==='adminCreateEvent'||payload.action==='adminUpdateEvent')?300000:90000;
+  return request('POST',API_URL,payload,timeout).then(function(r){
     if(!r.ok)throw new Error(r.code||r.error||'Ошибка');
     return r;
   });
@@ -583,6 +585,7 @@ window.adminHome=function(){
           (x.spreadsheetUrl?'<button class="mini" onclick="openExternal(\''+js(x.spreadsheetUrl)+'\')">Таблица</button>':'')+
           (x.workerUrl?'<button class="mini" onclick="copyText(\''+js(x.workerUrl)+'\')">Ссылка сотрудникам</button>':'')+
           '<button class="mini" onclick="createReportLink(\''+js(x.eventId)+'\')">Ссылка на ZIP</button>'+
+          '<button class="mini mini-danger" onclick="deleteEvent(\''+esc(js(x.eventId))+'\',\''+esc(js(x.name))+'\')">Удалить</button>'+
         '</div></div>';
     });
 
@@ -604,6 +607,20 @@ window.setEventStatus=function(eventId,status){
     toast(status==='HIDDEN'?'Мероприятие скрыто':'Мероприятие снова видно');
     adminHome();
   }).catch(function(e){toast('Не удалось изменить видимость: '+e.message)});
+}
+window.deleteEvent=function(eventId,name){
+  var typed=prompt('Чтобы удалить мероприятие «'+name+'» вместе с его фото и таблицей, введите его название:');
+  if(typed===null)return;
+  if(typed!==name){toast('Название не совпало. Мероприятие сохранено');return}
+  if(!confirm('Переместить мероприятие «'+name+'» и его файлы в корзину Google Drive? Ссылки на него перестанут работать.'))return;
+  toast('Удаляем мероприятие…');
+  post({action:'adminDeleteEvent',adminSession:adminSession,eventId:eventId,confirmName:name}).then(function(){
+    try{localStorage.removeItem(ACTIVE_EVENTS_CACHE)}catch(e){}
+    if(state.data&&state.data.event&&state.data.event.eventId===eventId){
+      state.data=null;eventKey='';
+    }
+    toast('Мероприятие удалено');adminHome();
+  }).catch(function(e){toast('Не удалось удалить: '+e.message)});
 }
 
 window.copyText=function(text){
